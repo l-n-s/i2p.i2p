@@ -18,96 +18,222 @@ import Cocoa
     return Optional.none
   }
   
+  var isFirefoxEnabled = false
+  
   @IBOutlet var routerStatusLabel: NSTextField?
   @IBOutlet var routerVersionLabel: NSTextField?
   @IBOutlet var routerStartedByLabel: NSTextField?
   @IBOutlet var routerUptimeLabel: NSTextField?
+  @IBOutlet var routerPIDLabel: NSTextField?
+  
   
   @IBOutlet var quickControlView: NSView?
   @IBOutlet var routerStartStopButton: NSButton?
+  @IBOutlet var openConsoleButton: NSButton?
+  @IBOutlet var launchFirefoxButton: NSButton?
+  
+  
+  @objc func actionBtnOpenConsole(_ sender: Any?) {
+    SwiftMainDelegate.openLink(url: "http://localhost:7657")
+  }
   
   @objc func actionBtnStartRouter(_ sender: Any?) {
-    NSLog("START ROUTER")
-    if (RouterManager.shared().getRouterTask() == nil) {
-      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath, javaBinPath: RouterProcessStatus.knownJavaBinPath!)
+    NSLog("Router start clicked")
+    /*if (RouterManager.shared().getRouterTask() == nil) {
+      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath)
+    }*/
+    (sender as! NSButton).isTransparent = true
+    let routerStatus = RouterRunner.launchAgent?.status()
+    DispatchQueue(label: "background_start").async {
+      switch routerStatus {
+      case .loaded?:
+        RouterManager.shared().routerRunner.StartAgent(RouterRunner.launchAgent)
+      case .unloaded?:
+        do {
+          try LaunchAgentManager.shared.load(RouterRunner.launchAgent!)
+          RouterManager.shared().routerRunner.StartAgent(RouterRunner.launchAgent)
+        } catch {
+          RouterManager.shared().eventManager.trigger(eventName: "router_exception", information: error)
+        }
+        break
+      default:
+        break
+      }
+      DispatchQueue.main.async {
+        self.reEnableButton()
+      }
     }
-    RouterManager.shared().updateState()
   }
   
   @objc func actionBtnStopRouter(_ sender: Any?) {
-    NSLog("STOP ROUTER")
-    if (RouterManager.shared().getRouterTask() != nil) {
-      NSLog("Found running router")
-      RouterManager.shared().getRouterTask()?.requestShutdown()
-      RouterManager.shared().updateState()
+    NSLog("Router stop clicked")
+    DispatchQueue(label: "background_shutdown").async {
+      RouterManager.shared().routerRunner.StopAgent({
+        RouterProcessStatus.isRouterRunning = false
+        RouterProcessStatus.isRouterChildProcess = false
+        NSLog("Router should be stopped by now.")
+      })
+      // Wait for it to die.
+      
+    }
+    RouterManager.shared().eventManager.trigger(eventName: "toggle_popover")
+    self.reEnableButton()
+  }
+  
+  @objc func actionBtnLaunchFirefox(_ sender: Any?) {
+    DispatchQueue.global(qos: .background).async {
+      Swift.print("Starting firefox")
+      FirefoxManager.shared().executeFirefox()
     }
   }
   
-  @objc func actionBtnRestartRouter(sender: Any?) {
-    if (RouterManager.shared().getRouterTask() != nil) {
-      RouterManager.shared().getRouterTask()?.requestRestart()
+  func restartFn() {
+    RouterManager.shared().routerRunner.StopAgent({
+      sleep(30)
+      RouterManager.shared().routerRunner.StartAgent()
+    })
+  }
+  
+  func handlerRouterStart(information:Any?) {
+    NSLog("Triggered handlerRouterStart")
+    NSLog("PID2! %@", information as! String)
+    routerPIDLabel?.cell?.stringValue = "Router PID: "+(information as! String)
+    routerPIDLabel?.needsDisplay = true
+    routerStatusLabel?.cell?.stringValue = "Router status: Running"
+    RouterManager.shared().lastRouterPid = (information as? String)
+    self.toggleSetButtonStop()
+    self.reEnableButton()
+  }
+  
+  func reEnableButton() {
+    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
+    if currentStatus != AgentStatus.loaded && currentStatus != AgentStatus.unloaded  {
+      self.toggleSetButtonStop()
     } else {
-      NSLog("Can't restart a non running router, start it however...")
-      SBridge.sharedInstance().startupI2PRouter(RouterProcessStatus.i2pDirectoryPath, javaBinPath: RouterProcessStatus.knownJavaBinPath!)
+      self.toggleSetButtonStart()
     }
-    RouterManager.shared().updateState()
+    routerStartStopButton?.isTransparent = false
+    routerStartStopButton?.needsDisplay = true
+    self.setRouterStatusLabelText()
   }
   
+  func setupObservers() {
+    RouterManager.shared().eventManager.listenTo(eventName: "router_start", action: handlerRouterStart)
+    RouterManager.shared().eventManager.listenTo(eventName: "router_stop", action: handleRouterStop)
+    RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: handlerRouterStart)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_running", action: reEnableButton)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_unloaded", action: reEnableButton)
+    RouterManager.shared().eventManager.listenTo(eventName: "launch_agent_loaded", action: reEnableButton)
+  }
   
+  func setupFirefoxBtn() {
+    DispatchQueue.global(qos: .background).async {
+      if (FirefoxManager.shared().IsFirefoxFound() && !self.isFirefoxEnabled) {
+        Swift.print("Enabling Firefox Launch Button")
+        DispatchQueue.main.async {
+          self.isFirefoxEnabled = true
+          self.launchFirefoxButton?.isEnabled = true
+          self.launchFirefoxButton?.isTransparent = false
+          self.launchFirefoxButton?.needsDisplay = true
+          self.launchFirefoxButton?.action = #selector(self.actionBtnLaunchFirefox(_:))
+          self.launchFirefoxButton?.target = self
+        }
+      }
+    }
+  }
   
   override func viewWillDraw() {
     super.viewWillDraw()
     if (RouterStatusView.instance != nil) {
       RouterStatusView.instance = self
     }
-    self.setRouterStatusLabelText()
+    self.reEnableButton()
+    openConsoleButton?.cell?.action = #selector(self.actionBtnOpenConsole(_:))
+    openConsoleButton?.cell?.target = self
+    
+  }
+  
+  func handleRouterStop() {
+    routerPIDLabel?.cell?.stringValue = "Router PID: Not running"
+    RouterManager.shared().lastRouterPid = nil
+    self.toggleSetButtonStart()
+    reEnableButton()
+  }
+  
+  private func toggleSetButtonStart() {
+    routerStatusLabel?.cell?.stringValue = "Router status: Not running"
+    routerStartStopButton?.title = "Start Router"
+    routerStartStopButton?.action = #selector(self.actionBtnStartRouter(_:))
+  }
+  
+  private func toggleSetButtonStop() {
+    routerStatusLabel?.cell?.stringValue = "Router status: Running"
+    routerStartStopButton?.title = "Stop Router"
+    routerStartStopButton?.action = #selector(self.actionBtnStopRouter(_:))
   }
   
   func setRouterStatusLabelText() {
-    if (RouterProcessStatus.isRouterRunning) {
-      routerStatusLabel?.cell?.stringValue = "Router status: Running"
-      routerStartStopButton?.title = "Stop Router"
-      routerStartStopButton?.action = #selector(self.actionBtnStopRouter(_:))
-    } else {
-      routerStatusLabel?.cell?.stringValue = "Router status: Not running"
-      routerStartStopButton?.title = "Start Router"
-      routerStartStopButton?.action = #selector(self.actionBtnStartRouter(_:))
-    }
-    routerStartStopButton?.needsDisplay = true
     routerStartStopButton?.target = self
-    quickControlView?.needsDisplay = true
+    let staticStartedByLabelText = "Router started by launcher? "
+    let staticIsRunningLabelText = "Router status: "
+    let staticRouterVersionLabelText = "Router version: "
+    let staticRouterPidLabelText = "Router PID: "
     
-    let staticStartedByLabelText = "Router started by launcher?"
-    if RouterProcessStatus.isRouterChildProcess {
-      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+" Yes"
+    // Use default here to avoid any potential crashes with force unwrapping
+    let currentStatus : AgentStatus = RouterRunner.launchAgent?.status() ?? AgentStatus.unloaded
+    if currentStatus == AgentStatus.loaded || currentStatus == AgentStatus.unloaded  {
+      routerStatusLabel?.cell?.stringValue = staticIsRunningLabelText+"Not running"
     } else {
-      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+" No"
+      routerStatusLabel?.cell?.stringValue = staticIsRunningLabelText+"Running"
     }
-    routerStartedByLabel?.needsDisplay = true
+    
+    if RouterProcessStatus.isRouterChildProcess {
+      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+"Yes"
+    } else {
+      routerStartedByLabel?.cell?.stringValue = staticStartedByLabelText+"No"
+    }
+    
+    // Try to display PID - if not, the string behind ?? is used as "default"
+    let tmpPidText = RouterManager.shared().lastRouterPid ?? "Not running"
+    routerPIDLabel?.cell?.stringValue = staticRouterPidLabelText+tmpPidText
     
     if let version = RouterProcessStatus.routerVersion {
-      routerVersionLabel?.cell?.stringValue = "Router version: " + version
+      routerVersionLabel?.cell?.stringValue = staticRouterVersionLabelText + version
     } else {
-      routerVersionLabel?.cell?.stringValue = "Router version: Still unknown"
+      routerVersionLabel?.cell?.stringValue = staticRouterVersionLabelText + "Still unknown"
     }
+    
     if let routerStartTime = RouterProcessStatus.routerStartedAt {
       routerUptimeLabel?.cell?.stringValue = "Uptime: Router started " + DateTimeUtils.timeAgoSinceDate(date: NSDate(date: routerStartTime), numericDates: false)
     } else {
       routerUptimeLabel?.cell?.stringValue = "Uptime: Router isn't running"
     }
+    
+    // Needs display function alerts the rendrerer that the UI parts need to be re-drawed.
+    routerStartStopButton?.needsDisplay = true
+    quickControlView?.needsDisplay = true
     routerUptimeLabel?.needsDisplay = true
+    routerVersionLabel?.needsDisplay = true
+    routerStartedByLabel?.needsDisplay = true
+    routerPIDLabel?.needsDisplay = true
   }
   
   
   init() {
     let c = NSCoder()
     super.init(coder: c)!
-    self.setRouterStatusLabelText()
+    self.setupObservers()
+    self.setupFirefoxBtn()
+    self.toggleSetButtonStart()
+    self.reEnableButton()
   }
   
   required init?(coder decoder: NSCoder) {
     super.init(coder: decoder)
-    self.setRouterStatusLabelText()
+    self.setupObservers()
+    self.setupFirefoxBtn()
+    self.toggleSetButtonStart()
+    self.reEnableButton()
   }
   
 }

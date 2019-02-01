@@ -203,7 +203,8 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         restofline = request.substring(pos); // ":80 HTTP/1.1" or " HTTP/1.1"
                     }
 
-                    if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
+                    String hostLowerCase = host.toLowerCase(Locale.US);
+                    if (hostLowerCase.endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                     } else if (host.contains(".") || host.startsWith("[")) {
@@ -224,7 +225,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         }
                         if (!usingInternalOutproxy) {
                             // The request must be forwarded to a outproxy
-                            currentProxy = selectProxy();
+                            currentProxy = selectProxy(hostLowerCase);
                             if (currentProxy == null) {
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
@@ -235,7 +236,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                             usingWWWProxy = true;
                             newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
                          }
-                    } else if (host.toLowerCase(Locale.US).equals("localhost")) {
+                    } else if (hostLowerCase.equals("localhost") || host.equals("127.0.0.1") ||
+                               hostLowerCase.endsWith(".localhost") ||
+                               host.startsWith("192.168.") || host.equals("[::1]")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
                         return;
                     } else {  // full b64 address (hopefully)
@@ -344,8 +347,13 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 data = newRequest.toString().getBytes("ISO-8859-1");
             else
                 response = SUCCESS_RESPONSE.getBytes("UTF-8");
-            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy,
+                                                currentProxy, requestId, targetRequest, false);
+            I2PTunnelRunner t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+            if (usingWWWProxy) {
+                // isSSL must be false for ConnectClient
+                t.setSuccessCallback(new OnProxySuccess(currentProxy, host, false));
+            }
             // we are called from an unlimited thread pool, so run inline
             //t.start();
             t.run();

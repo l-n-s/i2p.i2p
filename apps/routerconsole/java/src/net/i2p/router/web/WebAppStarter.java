@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.PortMapper;
@@ -138,8 +139,11 @@ public class WebAppStarter {
         if (classNames.length == 0)
             classNames = wac.getDefaultConfigurationClasses();
         String[] newClassNames = new String[classNames.length + 1];
-        for (int j = 0; j < classNames.length; j++)
+        for (int j = 0; j < classNames.length; j++) {
              newClassNames[j] = classNames[j];
+             // fix for Jetty 9.4 ticket #2385
+             wac.prependServerClass("-" + classNames[j]);
+        }
         newClassNames[classNames.length] = WebAppConfiguration.class.getName();
         wac.setConfigurationClasses(newClassNames);
     }
@@ -150,7 +154,7 @@ public class WebAppStarter {
      *  @since public since 0.9.33, was package private
      */
     public static void stopWebApp(RouterContext ctx, String appName) {
-        ContextHandler wac = getWebApp(appName);
+        ContextHandler wac = getWebApp(ctx, appName);
         if (wac == null)
             return;
         ctx.portMapper().unregister(appName);
@@ -158,7 +162,7 @@ public class WebAppStarter {
             // not graceful is default in Jetty 6?
             wac.stop();
         } catch (Exception ie) {}
-        ContextHandlerCollection server = getConsoleServer();
+        ContextHandlerCollection server = getConsoleServer(ctx);
         if (server == null)
             return;
         try {
@@ -173,16 +177,16 @@ public class WebAppStarter {
      *
      *  @since public since 0.9.33; was package private
      */
-    public static boolean isWebAppRunning(String appName) {
-        ContextHandler wac = getWebApp(appName);
+    public static boolean isWebAppRunning(I2PAppContext ctx, String appName) {
+        ContextHandler wac = getWebApp(ctx, appName);
         if (wac == null)
             return false;
         return wac.isStarted();
     }
     
     /** @since Jetty 6 */
-    static ContextHandler getWebApp(String appName) {
-        ContextHandlerCollection server = getConsoleServer();
+    static ContextHandler getWebApp(I2PAppContext ctx, String appName) {
+        ContextHandlerCollection server = getConsoleServer(ctx);
         if (server == null)
             return null;
         Handler handlers[] = server.getHandlers();
@@ -203,8 +207,8 @@ public class WebAppStarter {
      *  See comments in ConfigClientsHandler
      *  @since public since 0.9.33, was package private
      */
-    public static ContextHandlerCollection getConsoleServer() {
-        Server s = RouterConsoleRunner.getConsoleServer();
+    public static ContextHandlerCollection getConsoleServer(I2PAppContext ctx) {
+        Server s = RouterConsoleRunner.getConsoleServer(ctx);
         if (s == null)
             return null;
         Handler h = s.getChildHandlerByClass(ContextHandlerCollection.class);

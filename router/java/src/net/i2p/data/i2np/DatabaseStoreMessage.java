@@ -16,8 +16,11 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.EncryptedLeaseSet;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
+import net.i2p.data.MetaLeaseSet;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 
@@ -113,7 +116,8 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         
         // as of 0.9.18, ignore other 7 bits of the type byte, in preparation for future options
-        int dbType = data[curIndex] & 0x01;
+        // as of 0.9.38, ignore other 4 bits of the type byte, in preparation for future options
+        int dbType = data[curIndex] & 0x0f;
         curIndex++;
         
         _replyToken = DataHelper.fromLong(data, curIndex, 4);
@@ -132,8 +136,15 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             _replyGateway = null;
         }
         
-        if (dbType == DatabaseEntry.KEY_TYPE_LEASESET) {
-            _dbEntry = new LeaseSet();
+        if (DatabaseEntry.isLeaseSet(dbType)) {
+            if (dbType == DatabaseEntry.KEY_TYPE_LEASESET)
+                _dbEntry = new LeaseSet();
+            else if (dbType == DatabaseEntry.KEY_TYPE_LS2)
+                _dbEntry = new LeaseSet2();
+            else if (dbType == DatabaseEntry.KEY_TYPE_ENCRYPTED_LS2)
+                _dbEntry = new EncryptedLeaseSet();
+            else
+                _dbEntry = new MetaLeaseSet();
             try {
                 _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
             } catch (DataFormatException dfe) {
@@ -141,7 +152,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else {   // dbType == DatabaseEntry.KEY_TYPE_ROUTERINFO
+        } else if ((dbType & 0x01) == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
@@ -160,8 +171,12 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the routerInfo", dfe);
             } catch (IOException ioe) {
+                //net.i2p.util.Log log = new net.i2p.util.Log(DatabaseStoreMessage.class);
+                //log.error("Corrupt compressed routerInfo size = " + compressedSize + " key " + _key, ioe);
                 throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
+        } else {
+            throw new I2NPMessageException("Unknown type " + dbType);
         }
         //if (!key.equals(_dbEntry.getHash()))
         //    throw new I2NPMessageException("Hash mismatch in DSM");
@@ -181,7 +196,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         if (_replyToken > 0) 
             len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
         int type = _dbEntry.getType();
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+        if (_dbEntry.isLeaseSet()) {
             if (_byteCache == null) {
                 _byteCache = _dbEntry.toByteArray();
             }
@@ -203,7 +218,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if (_dbEntry == null) throw new I2NPMessageException("Missing entry");
         int type = _dbEntry.getType();
-        if (type != DatabaseEntry.KEY_TYPE_LEASESET && type != DatabaseEntry.KEY_TYPE_ROUTERINFO)
+        if (type != DatabaseEntry.KEY_TYPE_ROUTERINFO && !_dbEntry.isLeaseSet())
             throw new I2NPMessageException("Invalid key type " + type);
         
         // Use the hash of the DatabaseEntry
@@ -269,7 +284,11 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             buf.append("\n\tReply tunnel: ").append(_replyTunnel);
             buf.append("\n\tReply gateway: ").append(_replyGateway);
         }
-        buf.append("\n\tKey: ").append(getKey());
+        buf.append("\n\tKey: ");
+        if (_dbEntry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            buf.append(getKey());
+        else
+            buf.append(getKey().toBase32());
         buf.append("\n\tEntry: ").append(_dbEntry);
         buf.append(']');
         return buf.toString();

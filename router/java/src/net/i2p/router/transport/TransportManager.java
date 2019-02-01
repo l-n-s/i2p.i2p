@@ -378,6 +378,8 @@ public class TransportManager implements TransportEventListener {
     synchronized void shutdown() {
         stopListening();
         _dhThread.shutdown();
+        if (_xdhThread != null)
+            _xdhThread.shutdown();
         Addresses.clearCaches();
         TransportImpl.clearCaches();
     }
@@ -552,6 +554,17 @@ public class TransportManager implements TransportEventListener {
     void mayDisconnect(Hash peer) {
         for (Transport t : _transports.values()) {
              t.mayDisconnect(peer);
+        }
+    }
+    
+    /**
+     * Tell the transports to disconnect from this peer.
+     *
+     * @since 0.9.38
+     */
+    void forceDisconnect(Hash peer) {
+        for (Transport t : _transports.values()) {
+             t.forceDisconnect(peer);
         }
     }
     

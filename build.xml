@@ -76,7 +76,7 @@
             <echo message="The following command will install the build dependencies for you:" />
             <echo message=" " />
             <echo message="sudo apt-get install debhelper ant debconf default-jdk gettext libgmp-dev po-debconf fakeroot \" />
-            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java \"  />
+            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java libjson-simple-java \"  />
             <echo message="  devscripts libjetty9-java libtomcat8-java libtaglibs-standard-jstlel-java libgetopt-java"  />
             <echo message=" " />
             <echo message="The following command will install the additional runtime dependencies:" />
@@ -286,7 +286,7 @@
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
 
-    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark" />
+    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark, buildI2PControl" />
 
     <target name="builddepSmall" depends="buildrouter, buildSystray, buildDesktopGui, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
 
@@ -356,6 +356,11 @@
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
 
+    <target name="buildI2PControl" depends="buildRouter, buildJetty" >
+        <ant dir="apps/i2pcontrol" target="war" />
+        <copy file="apps/i2pcontrol/build/jsonrpc.war" todir="build/" />
+    </target>
+
     <target name="buildI2PSnark" depends="buildStreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java/" target="war" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
@@ -388,10 +393,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
     </target>
 
-    <target name="buildDesktopGui" depends="buildCore, buildrouter" >
-<!--
-        <ant dir="apps/desktopgui" target="clean" />
--->
+    <target name="buildDesktopGui" depends="buildCore, buildrouter, buildSystray" >
         <ant dir="apps/desktopgui" target="jar" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
@@ -443,11 +445,13 @@
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp" >
+    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber, setBuildTimestamp, disableManifestClasspath" >
         <!-- default if not set above -->
         <property name="workspace.version" value="unknown" />
         <!-- default if not set by setBuildTimestamp -->
         <property name="build.timestamp" value="reproducible" />
+        <!-- default if not set by disableManifestClasspath -->
+        <property name="manifest.classpath.name" value="Class-Path" />
         <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
         <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
     </target>
@@ -456,6 +460,11 @@
         <tstamp>
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
+    </target>
+
+    <!-- Disable Class-Path in jar manifests by renaming it (Fedora) -->
+    <target name="disableManifestClasspath" if="${without-manifest-classpath}" >
+        <property name="manifest.classpath.name" value="Disabled-Class-Path" />
     </target>
 
     <target name="buildWEB" depends="buildRouterConsole" >
@@ -810,6 +819,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc access="package"
+            source="${javac.version}"
             destdir="./build/javadoc"
             packagenames="*"
             use="true"
@@ -818,15 +828,16 @@
             additionalparam="-notimestamp"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:net.minidev.json:net.minidev.json.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util:org.json.simple:org.json.simple.*:com.southernstorm.noise.crypto.x25519" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.geoip:com.southernstorm.noise.*" />
-            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:net.i2p.router.news" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.*:com.southernstorm.noise.*" />
+            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.web.*:net.i2p.router.update:net.i2p.router.sybil:edu.internet2.ndt:net.i2p.router.news:com.vuze.*" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook:net.i2p.router.naming:net.metanotion:net.metanotion.*" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />
             <group title="BOB Demos" packages="net.i2p.BOB.Demos.echo.echoclient:net.i2p.BOB.Demos.echo.echoserver" />
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
+            <group title="I2PControl Application" packages="net.i2p.i2pcontrol:net.i2p.i2pcontrol.*:org.mindrot.jbcrypt:com.thetransactioncompany.jsonrpc2:com.thetransactioncompany.jsonrpc2.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Imagegen Application" packages="com.docuverse.identicon:com.google.zxing:com.google.zxing.*:net.i2p.imagegen" />
@@ -862,6 +873,7 @@
                 <pathelement location="apps/imagegen/zxing/javase/src/main/java" />
                 <pathelement location="apps/jrobin/java/src" />
                 <pathelement location="installer/java/src" />
+                <pathelement location="apps/i2pcontrol/java" />
             </sourcepath>
             <classpath>
                 <!-- warning, some entries are needed for Debian builds only -->
@@ -881,6 +893,7 @@
                 <!-- following are only for debian builds -->
                 <pathelement location="core/java/build/libintl.jar" />
                 <pathelement location="core/java/build/gnu-getopt.jar" />
+                <pathelement location="core/java/build/json-simple.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->
@@ -1312,12 +1325,12 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
+        <copy file="build/jsonrpc.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
-        <copy file="installer/resources/systray.config" todir="pkg-temp/" />
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
@@ -1362,6 +1375,7 @@
                 <istrue value="${with-libtomcat6-java}" />
                 <istrue value="${with-libtomcat7-java}" />
                 <istrue value="${with-libtomcat8-java}" />
+                <istrue value="${with-libtomcat9-java}" />
             </or>
         </condition>
     </target>
@@ -1434,10 +1448,17 @@
     </target>
 
     <!-- SSL Certs -->
-    <target name="prepCertificates">
+    <target name="prepCertificates" depends="buildCore">
         <copy todir="pkg-temp/certificates/" >
           <fileset dir="installer/resources/certificates/" />
         </copy>
+        <java classname="net.i2p.crypto.CertUtil" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="checkall" />
+            <arg value="pkg-temp/certificates" />
+        </java>
     </target>
 
     <condition property="no.bundle.routerInfos">
@@ -1640,6 +1661,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
+        <copy file="build/jsonrpc.war" todir="pkg-temp/webapps/" />
         <!-- as of 0.7.12; last changed in 0.9; removed from update in 0.9.26 -->
       <!--
         <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
@@ -1678,8 +1700,6 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <!-- small enough to include for now -->
-        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
@@ -1708,8 +1728,12 @@
     <!-- GeoIP files, set withGeoIPDatabase=true in override.properties to prevent -->
     <!-- As of 0.9.26, the files are not included in Debian/Ubuntu builds. -->
     <target name="prepgeoupdate-unlesspkg" unless="${with-geoip-database}" >
+        <mkdir dir="pkg-temp/geoip" />
+      <!--
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
+       -->
+        <gunzip src="installer/resources/GeoLite2-Country.mmdb.gz" dest="pkg-temp/geoip/GeoLite2-Country.mmdb" />
     </target>
 
     <!-- All jetty jars required for update.
@@ -2084,6 +2108,7 @@
             <arg value="build/i2ptunnel.war"/>
             <arg value="build/imagegen.war"/>
             <arg value="build/jetty-i2p.jar"/>
+            <arg value="build/jsonrpc.war"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
             <arg value="build/desktopgui.jar"/>
@@ -2105,9 +2130,9 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndJbigiRepack, updater200WithJettyAndJbigi, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
--->
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+-->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
@@ -2450,6 +2475,8 @@
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <!-- libgetopt-java -->
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <!-- libjson-simple-java -->
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
             <!-- libhttpclient-java and libhttpcore-java -->
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
@@ -2457,6 +2484,7 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <!-- libjetty9-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <!-- libtomcat8-java -->
@@ -2538,6 +2566,7 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <!-- libjetty9-java -->
           <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
@@ -2615,11 +2644,13 @@
             <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
           <!--
@@ -2688,11 +2719,13 @@
             <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/json" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <file name="../i2p-${Extended.Version}/installer/resources/GeoLite2-Country.mmdb.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-${jetty.ver}" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />

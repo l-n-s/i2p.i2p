@@ -39,11 +39,13 @@ import net.i2p.util.VersionComparator;
  */
 public class JspC {
     // First Tomcat version to support multiple threads and -threadCount arg
-    private static final String THREADS_VERSION = "8.5.33";
+    private static final String THREADS_VERSION_8 = "8.5.33";
+    private static final String THREADS_VERSION_9 = "9.0.11";
     // if true, try to make web.xml reproducible
     private static final boolean REPRODUCIBLE = Boolean.valueOf(System.getProperty("build.reproducible"));
     // if true, we must get the Tomcat version out of the jasper jar's manifest
-    private static final boolean SYSTEM_TOMCAT = Boolean.valueOf(System.getProperty("with-libtomcat8-java"));
+    private static final boolean SYSTEM_TOMCAT = Boolean.valueOf(System.getProperty("with-libtomcat8-java")) ||
+                                                 Boolean.valueOf(System.getProperty("with-libtomcat9-java"));
     // path to the jasper jar
     private static final String JASPER_JAR = System.getProperty("jasper.jar");
 
@@ -108,8 +110,12 @@ public class JspC {
                 Attributes atts = attributes(JASPER_JAR);
                 if (atts != null) {
                     String ver = atts.getValue("Implementation-Version");
-                    if (ver != null && ver.startsWith("8.")) {
-                        supportsThreads = VersionComparator.comp(ver, THREADS_VERSION) >= 0;
+                    if (ver != null) {
+                        if (ver.startsWith("8.")) {
+                            supportsThreads = VersionComparator.comp(ver, THREADS_VERSION_8) >= 0;
+                        } else {
+                            supportsThreads = VersionComparator.comp(ver, THREADS_VERSION_9) >= 0;
+                        }
                         System.out.println("Found JspC version: " + ver + ", supports threads? " + supportsThreads);
                     }
                 }

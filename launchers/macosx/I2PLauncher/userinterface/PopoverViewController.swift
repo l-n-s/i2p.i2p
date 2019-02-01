@@ -10,10 +10,19 @@ import Cocoa
 
 class PopoverViewController: NSViewController {
   
+  @IBOutlet var routerStatusViewOutlet: RouterStatusView?
+  
+  func getRouterStatusView() -> RouterStatusView? {
+    return self.routerStatusViewOutlet
+  }
+  
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
   
+  @IBAction func onPreferencesClick(_ sender: Any) {
+    StatusBarController.launchPreferences(sender)
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()

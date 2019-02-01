@@ -18,14 +18,10 @@
 
 #include "RouterTask.h"
 
-
-#define DEF_I2P_VERSION "0.9.36"
-#define APPDOMAIN "net.i2p.launcher"
-#define NSAPPDOMAIN @APPDOMAIN
-#define CFAPPDOMAIN CFSTR(APPDOMAIN)
-#define APP_IDSTR @"I2P Launcher"
+#include "version.h"
 
 @class SwiftMainDelegate;
+@class I2PDeployer;
 
 @protocol SwiftMainDelegateProto
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
@@ -61,6 +57,17 @@ inline std::string getDefaultBaseDir()
   return i2pBaseDir;
 }
 
+inline std::string getDefaultLogDir()
+{
+  // Figure out log directory
+  auto homeDir = RealHomeDirectory();
+  const char* pathFromHome = "%s/Library/Logs/I2P";
+  char buffer[strlen(homeDir)+strlen(pathFromHome)];
+  sprintf(buffer, pathFromHome, homeDir);
+  std::string i2pBaseDir(buffer);
+  return i2pBaseDir;
+}
+
 inline void sendUserNotification(NSString* title, NSString* informativeText, bool makeSound = false) {
   NSUserNotification *userNotification = [[NSUserNotification alloc] init];
   
@@ -86,6 +93,7 @@ inline void sendUserNotification(NSString* title, NSString* informativeText, boo
 @property (assign) SwiftMainDelegate *swiftRuntime;
 @property (assign) NSUserDefaults *userPreferences;
 @property (assign) ExtractMetaInfo *metaInfo;
+@property (assign) I2PDeployer *deployer;
 @property (copy) NSImage *contentImage NS_AVAILABLE(10_9, NA);
 
 - (void) extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion;

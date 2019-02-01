@@ -15,7 +15,13 @@ import Cocoa
   let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
   let storyboard = NSStoryboard(name: "Storyboard", bundle: Bundle.main)
   
-  var updateObjectRef : SUUpdater?
+  var ctrl : PopoverViewController?
+  private static var preferencesController: NSWindowController?
+  private static var experimentalConsoleViewController: NSWindowController?
+
+  @IBOutlet var routerStatusTabView: RouterStatusView?
+  
+  //var updateObjectRef : SUUpdater?
   
   @objc func handleOpenConsole(_ sender: Any?) {
     SwiftMainDelegate.openLink(url: "http://localhost:7657")
@@ -24,25 +30,91 @@ import Cocoa
   @objc func constructMenu() -> NSMenu {
     let menu = NSMenu()
     
-    let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
+    /*let updateMenuItem = NSMenuItem(title: "Check for updates", action: #selector(self.updateObjectRef?.checkForUpdates(_:)), keyEquivalent: "U")
     updateMenuItem.isEnabled = true
+    */
+    
+    let preferencesMenuItem = NSMenuItem(title: "Preferences", action: #selector(StatusBarController.launchPreferences(_:)), keyEquivalent: "P")
+    preferencesMenuItem.isEnabled = true
     
     menu.addItem(NSMenuItem(title: "Open I2P Console", action: #selector(self.handleOpenConsole(_:)), keyEquivalent: "O"))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(updateMenuItem)
+    //menu.addItem(updateMenuItem)
+    menu.addItem(preferencesMenuItem)
     menu.addItem(NSMenuItem.separator())
     menu.addItem(NSMenuItem(title: "Quit I2P Launcher", action: #selector(SwiftMainDelegate.terminate(_:)), keyEquivalent: "q"))
     
     return menu
   }
+  
+  static func onExperimentalConsoleViewClick(_ sender: NSButton) {
+    if #available(OSX 10.12, *) {
+      print("Clicked for Experimental Console WebView")
+      if !(experimentalConsoleViewController != nil) {
+        let storyboard = NSStoryboard(name: "ConsoleWebView", bundle: Bundle.main)
+        experimentalConsoleViewController = storyboard.instantiateInitialController() as? NSWindowController
+        print("created experimental console webview controller")
+      }
+      if (experimentalConsoleViewController != nil) {
+        experimentalConsoleViewController!.showWindow(sender)
+        print("trying to view: Console WebView")
+      }
+    } else {
+      // Sorry, only OSX >= 10.12
+    }
+  }
+  
+  static func launchPreferences(_ sender: Any) {
+    print("Preferences clicked")
+    if !(preferencesController != nil) {
+      let storyboard = NSStoryboard(name: "Preferences", bundle: Bundle.main)
+      preferencesController = storyboard.instantiateInitialController() as? NSWindowController
+      print("created preferences controller")
+    }
+    if (preferencesController != nil) {
+      NSApp.activate(ignoringOtherApps: true)
+      preferencesController!.showWindow(sender)
+      print("trying to view: Preferences")
+    }
+  }
+  
+  static func launchRouterConsole(_ sender: Any) {
+    if (!Preferences.shared().featureToggleExperimental) {
+      // The normal...
+      NSWorkspace.shared().open(URL(string: "http://127.0.0.1:7657")!)
+    } else {
+      // Experimental
+    }
+  }
+  
+  func pidReaction(information:Any?){
+    let pidStr = information as! String
+    NSLog("PID! %@", pidStr)
+    showPopover(sender: nil)
+    RouterManager.shared().lastRouterPid = pidStr
+    self.ctrl?.getRouterStatusView()?.needsDisplay = true
+  }
+  
+  func event_toggle(information:Any?) {
+    self.togglePopover(sender: self)
+  }
 
   
   override init() {
     super.init()
-    popover.contentViewController = PopoverViewController.freshController()
-    updateObjectRef = SUUpdater.shared()
-    updateObjectRef?.checkForUpdatesInBackground()
+    self.ctrl = PopoverViewController.freshController()
+    popover.contentViewController = self.ctrl
+    RouterManager.shared().eventManager.listenTo(eventName: "router_pid", action: pidReaction)
     
+    RouterManager.shared().eventManager.listenTo(eventName: "toggle_popover", action: event_toggle)
+    
+    FirefoxManager.shared().tryAutoDetect()
+    
+    print("Is Firefox found? \(FirefoxManager.shared().IsFirefoxFound())")
+    print("Is Firefox profile extracted at \(Preferences.shared()["I2Pref_firefoxProfilePath"] as! String)? \(FirefoxManager.shared().IsProfileExtracted())")
+    if (!FirefoxManager.shared().IsProfileExtracted()) {
+      FirefoxManager.shared().unzipProfile()
+    }
     
     if let button = statusItem.button {
       button.image = NSImage(named:"StatusBarButtonImage")
@@ -56,7 +128,6 @@ import Cocoa
   @IBAction func openConsoleClicked(_ sender: Any) {
     NSLog("openConsoleClicked got clicked")
     let realSender = sender as! NSMenuItem
-    NSWorkspace.shared().open(URL(string: "http://127.0.0.1:7657")!)
     NSLog("Sender: @%", realSender)
   }
   
@@ -100,7 +171,6 @@ import Cocoa
     if popover.isShown {
       closePopover(sender: sender)
     } else {
-      RouterManager.shared().updateState()
       showPopover(sender: sender)
     }
   }

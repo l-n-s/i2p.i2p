@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
@@ -33,6 +34,7 @@ import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
+import net.i2p.router.sybil.Analysis;
 import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileSuffixFilter;
@@ -100,7 +102,7 @@ public class RouterConsoleRunner implements RouterApp {
     private final RouterContext _context;
     private final ClientAppManager _mgr;
     private volatile ClientAppState _state = UNINITIALIZED;
-    private static Server _server;
+    private Server _server;
     private static ScheduledExecutorScheduler _jettyTimer;
     private String _listenPort;
     private String _listenHost;
@@ -116,6 +118,7 @@ public class RouterConsoleRunner implements RouterApp {
         // default changed from 0 (forever) in Jetty 6 to 60*1000 ms in Jetty 7
         authenticator.setMaxNonceAge(7*24*60*60*1000L);
     }
+    private static final String NAME = "console";
     public static final String JETTY_REALM = "i2prouter";
     private static final String JETTY_ROLE = "routerAdmin";
     public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
@@ -264,7 +267,7 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.4 */
     public String getName() {
-        return "console";
+        return NAME;
     }
 
     /** @since 0.9.4 */
@@ -281,13 +284,24 @@ public class RouterConsoleRunner implements RouterApp {
     }
 
     /**
-     *  SInce _server is now static
+     *  To get to Jetty
      *  @return may be null or stopped perhaps
      *  @since Jetty 6 since it doesn't have Server.getServers()
      */
-    static Server getConsoleServer() {
+    synchronized Server getConsoleServer() {
         return _server;
     }
+
+    /**
+     *  To get to Jetty
+     *  @return may be null or stopped perhaps
+     *  @since 0.9.38
+     */
+    static Server getConsoleServer(I2PAppContext ctx) {
+        ClientApp app = ctx.clientAppManager().getRegisteredApp(NAME);
+        return (app != null) ? ((RouterConsoleRunner)app).getConsoleServer() : null;
+    }
+
 
     /** @since 0.8.13, moved from LogsHelper in 0.9.33 */
     public static String jettyVersion() {
@@ -329,9 +343,10 @@ public class RouterConsoleRunner implements RouterApp {
         boolean noJava7 = !SystemVersion.isJava7();
         boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
                             !FileUtil.isPack200Supported();
-        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        boolean isJava11 = SystemVersion.isJava11();
-        if (noJava7 || noPack200 || openARM || isJava11) {
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK() && !SystemVersion.isJava9();
+        boolean isZero = SystemVersion.isZeroVM();
+        boolean isJava11 = false; // SystemVersion.isJava11();
+        if (noJava7 || noPack200 || openARM || isZero || isJava11) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -350,15 +365,20 @@ public class RouterConsoleRunner implements RouterApp {
                 System.out.println("Warning: " + s);
             }
             if (openARM) {
-                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
+                s = "OpenJDK 7/8 are not recommended for ARM. Use OpenJDK 9 (or higher) or Oracle Java 8 (or higher)";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
-            if (isJava11) {
-                s = "Java 11+ support is beta, and not recommended for general use";
+            if (isZero) {
+                s = "OpenJDK Zero is a very slow interpreter-only JVM. Not recommended for use with I2P. Please use a faster JVM if possible.";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
+            //if (isJava11) {
+            //    s = "Java 11+ support is beta, and not recommended for general use";
+            //    log.logAlways(net.i2p.util.Log.WARN, s);
+            //    System.out.println("Warning: " + s);
+            //}
         }
     }
 
@@ -782,6 +802,10 @@ public class RouterConsoleRunner implements RouterApp {
                             props.remove(PREFIX + "addressbook" + ENABLED);
                             rewrite = true;
                         }
+                    } else if (appName.equals("jsonrpc") && enabled == null) {
+                        // jsonrpc (i2pcontrol) webapp default is false
+                        props.setProperty(PREFIX + "jsonrpc" + ENABLED, "false");
+                        rewrite = true;
                     } else if (! "false".equals(enabled)) {
                         try {
                             String path = files[i].getCanonicalPath();
@@ -833,7 +857,7 @@ public class RouterConsoleRunner implements RouterApp {
             }
         }
 
-        Thread t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
+        Thread t = new I2PAppThread(new StatSummarizer(_context), "StatSummarizer", true);
         t.setPriority(Thread.NORM_PRIORITY - 1);
         t.start();
         
@@ -852,6 +876,13 @@ public class RouterConsoleRunner implements RouterApp {
             if (_mgr == null)
                 _context.addShutdownTask(new ServerShutdown());
             ConfigServiceHandler.registerSignalHandler(_context);
+
+            if (_mgr != null &&
+                _context.getBooleanProperty(HelperBase.PROP_ADVANCED) &&
+                _context.getProperty(Analysis.PROP_FREQUENCY, 0L) > 0) {
+                // registers and starts itself
+                Analysis.getInstance(_context);
+            }
     }
     
     /**
@@ -1113,7 +1144,7 @@ public class RouterConsoleRunner implements RouterApp {
                 String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                 if (ROUTERCONSOLE.equals(app))
                     continue;
-                if (WebAppStarter.isWebAppRunning(app)) {
+                if (WebAppStarter.isWebAppRunning(_context, app)) {
                     try {
                         WebAppStarter.stopWebApp(_context, app);
                     } catch (Throwable t) { t.printStackTrace(); }

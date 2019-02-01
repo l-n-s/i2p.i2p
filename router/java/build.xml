@@ -34,6 +34,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <target name="compile" depends="depend, dependVersion">
         <mkdir dir="./build" />
@@ -66,7 +67,7 @@
         <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
                 <!-- so people with very old wrapper.config files will still work with Jetty 6 -->
-                <attribute name="Class-Path" value="i2p.jar addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
+                <attribute name="${manifest.classpath.name}" value="i2p.jar addressbook.jar jetty-i2p.jar jetty-rewrite-handler.jar jetty-start.jar jetty-util.jar" />
                 <attribute name="Specification-Title" value="I2P Router" />
                 <attribute name="Specification-Version" value="${release.number}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
@@ -141,7 +142,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
@@ -162,6 +163,7 @@
             includeAntRuntime="true"
             destdir="./build/obj">
             <classpath>
+                <pathelement path="${javac.classpath}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

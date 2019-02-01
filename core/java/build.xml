@@ -20,6 +20,7 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
     <property name="javac.version" value="1.7" />
+    <property name="manifest.classpath.name" value="Class-Path" />
 
     <!-- fixups if we're using libintl.jar for GettextResource.java -->
     <condition property="source.exclude1" value="gnu/gettext/GettextResource.java" else="NOTHING" >
@@ -45,7 +46,14 @@
     <condition property="javac.classpath.mod3" value="build/httpclient.jar:build/httpcore.jar:" else="" >
         <istrue value="${with-libhttpclient-java}" />
     </condition>
-    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath.mod3}${javac.classpath}" />
+    <!-- fixups if we're using json-simple.jar for org.json.simple classes -->
+    <condition property="source.exclude4" value="org/json/simple/**" else="NOTHING" >
+        <istrue value="${with-libjson-simple-java}" />
+    </condition>
+    <condition property="javac.classpath.mod4" value="build/json-simple.jar:" else="" >
+        <istrue value="${with-libjson-simple-java}" />
+    </condition>
+    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath.mod3}${javac.classpath.mod4}${javac.classpath}" />
 
     <!-- jar classpath fixups -->
     <condition property="gettext.jar" value="/usr/share/java/libintl.jar" else="" >
@@ -56,6 +64,9 @@
     </condition>
     <condition property="httpclient.jar" value="/usr/share/java/httpclient.jar /usr/share/java/httpcore.jar" else="" >
         <istrue value="${with-libhttpclient-java}" />
+    </condition>
+    <condition property="json-simple.jar" value="/usr/share/java/json-simple.jar" else="" >
+        <istrue value="${with-libjson-simple-java}" />
     </condition>
 
     <target name="compile" depends="depend">
@@ -71,6 +82,7 @@
             <exclude name="${source.exclude1}" />
             <exclude name="${source.exclude2}" />
             <exclude name="${source.exclude3}" />
+            <exclude name="${source.exclude4}" />
         </javac>
     </target>
 
@@ -96,7 +108,7 @@
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>
-                <attribute name="Class-Path" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
+                <attribute name="${manifest.classpath.name}" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
                 <attribute name="Specification-Version" value="${release.number}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
@@ -159,7 +171,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${javac.classpath.mod}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />

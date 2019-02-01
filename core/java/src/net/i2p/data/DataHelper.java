@@ -139,19 +139,26 @@ public class DataHelper {
      *
      *  As of 0.9.18, throws DataFormatException on duplicate key
      *
-     *  @param props the Properties to load into
+     *  @param props The Properties to load into.
+     *               As of 0.9.38, if null, a new OrderedProperties will be created.
      *  @param rawStream stream to read the mapping from
      *  @throws DataFormatException if the format is invalid
      *  @throws IOException if there is a problem reading the data
-     *  @return the parameter props
+     *  @return the parameter props, or (as of 0.9.38) a new OrderedProperties if props is null,
+     *                               and an immutable EmptyProperties if empty.
      *  @since 0.8.13
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
         throws DataFormatException, IOException {
-        long size = readLong(rawStream, 2);
-        byte data[] = new byte[(int) size];
-        int read = read(rawStream, data);
-        if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
+        int size = (int) readLong(rawStream, 2);
+        if (size == 0) {
+            return (props != null) ? props : EmptyProperties.INSTANCE;
+        }
+        if (props == null)
+            props = new OrderedProperties();
+        byte data[] = new byte[size];
+        // full read guaranteed
+        read(rawStream, data);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         while (in.available() > 0) {
             String key = readString(in);
@@ -213,7 +220,7 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
-        writeProperties(rawStream, props, utf8, props != null && !(props instanceof OrderedProperties));
+        writeProperties(rawStream, props, utf8, props != null && props.size() > 1 && !(props instanceof OrderedProperties));
     }
 
     /**
@@ -242,7 +249,7 @@ public class DataHelper {
             throws DataFormatException, IOException {
         if (props != null && !props.isEmpty()) {
             Properties p;
-            if (sort) {
+            if (sort && props.size() > 1) {
                 p = new OrderedProperties();
                 p.putAll(props);
             } else {
@@ -400,14 +407,14 @@ public class DataHelper {
     /**
      * Pretty print the mapping, unsorted
      * (unless the options param is an OrderedProperties)
-     * @since 0.9.4
+     * @since 0.9.4, as of 0.9.38 supports non-String values
      */
     public static String toString(Map<?, ?> options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
             for (Map.Entry<?, ?> entry : options.entrySet()) {
                 String key = (String) entry.getKey();
-                String val = (String) entry.getValue();
+                String val = entry.getValue().toString();
                 buf.append("[").append(key).append("] = [").append(val).append("]");
             }
         } else {
@@ -452,7 +459,7 @@ public class DataHelper {
     public static void loadProps(Properties props, InputStream inStr, boolean forceLowerCase) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 16*1024);
+            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 4*1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;
@@ -866,9 +873,8 @@ public class DataHelper {
             return "";   // reduce object proliferation
         size &= 0xff;
         byte raw[] = new byte[size];
-        int read = read(in, raw);
-        // was DataFormatException
-        if (read != size) throw new EOFException("EOF reading string");
+        // full read guaranteed
+        read(in, raw);
         // the following constructor throws an UnsupportedEncodingException which is an IOException,
         // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
         return new String(raw, "UTF-8");
@@ -929,88 +935,6 @@ public class DataHelper {
             out.write(raw);
         }
     }
-
-    /** Read in a boolean as specified by the I2P data structure spec.
-     * A boolean is 1 byte that is either 0 (false), 1 (true), or 2 (null)
-     * @param in stream to read from
-     * @throws DataFormatException if the boolean is not valid
-     * @throws IOException if there is an IO error reading the boolean
-     * @return boolean value, or null
-     * @deprecated unused
-     */
-    @Deprecated
-    public static Boolean readBoolean(InputStream in) throws DataFormatException, IOException {
-        int val = in.read();
-        switch (val) {
-        case -1:
-            throw new EOFException("EOF reading boolean");
-        case 0:
-            return Boolean.FALSE;
-        case 1:
-            return Boolean.TRUE;
-        case 2:
-            return null;
-        default:
-            throw new DataFormatException("Uhhh.. readBoolean read a value that isn't a known ternary val (0,1,2): "
-                                          + val);
-        }
-    }
-
-    /** Write out a boolean as specified by the I2P data structure spec.
-     * A boolean is 1 byte that is either 0 (false), 1 (true), or 2 (null)
-     * @param out stream to write to
-     * @param bool boolean value, or null
-     * @throws DataFormatException if the boolean is not valid
-     * @throws IOException if there is an IO error writing the boolean
-     * @deprecated unused
-     */
-    @Deprecated
-    public static void writeBoolean(OutputStream out, Boolean bool) 
-        throws DataFormatException, IOException {
-        if (bool == null)
-            writeLong(out, 1, BOOLEAN_UNKNOWN);
-        else if (Boolean.TRUE.equals(bool))
-            writeLong(out, 1, BOOLEAN_TRUE);
-        else
-            writeLong(out, 1, BOOLEAN_FALSE);
-    }
-    
-    /** @deprecated unused */
-    @Deprecated
-    public static Boolean fromBoolean(byte data[], int offset) {
-        if (data[offset] == BOOLEAN_TRUE)
-            return Boolean.TRUE;
-        else if (data[offset] == BOOLEAN_FALSE)
-            return Boolean.FALSE;
-        else
-            return null;
-    }
-    
-    /** @deprecated unused */
-    @Deprecated
-    public static void toBoolean(byte data[], int offset, boolean value) {
-        data[offset] = (value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-    }
-
-    /** @deprecated unused */
-    @Deprecated
-    public static void toBoolean(byte data[], int offset, Boolean value) {
-        if (value == null)
-            data[offset] = BOOLEAN_UNKNOWN;
-        else
-            data[offset] = (value.booleanValue() ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-    }
-    
-    /** deprecated - used only in DatabaseLookupMessage */
-    public static final byte BOOLEAN_TRUE = 0x1;
-    /** deprecated - used only in DatabaseLookupMessage */
-    public static final byte BOOLEAN_FALSE = 0x0;
-    /** @deprecated unused */
-    @Deprecated
-    public static final byte BOOLEAN_UNKNOWN = 0x2;
-    /** @deprecated unused */
-    @Deprecated
-    public static final int BOOLEAN_LENGTH = 1;
 
     //
     // The following comparator helpers make it simpler to write consistently comparing

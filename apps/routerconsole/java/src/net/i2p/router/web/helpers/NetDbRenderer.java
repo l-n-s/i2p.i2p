@@ -25,18 +25,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.crypto.EncType;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.LeaseSet2;
+import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import static net.i2p.router.sybil.Util.biLog2;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.WebAppStarter;
 import net.i2p.util.Log;
@@ -173,7 +178,8 @@ class NetDbRenderer {
                     (version != null && version.equals(ri.getVersion())) ||
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     (family != null && family.equals(ri.getOption("family"))) ||
-                    (caps != null && ri.getCapabilities().contains(caps)) ||
+                    // 'O' will catch PO and XO also
+                    (caps != null && hasCap(ri, caps)) ||
                     (tr != null && ri.getTargetAddress(tr) != null) ||
                     (type != null && type == ri.getIdentity().getSigType())) {
                     if (skipped < toSkip) {
@@ -358,6 +364,22 @@ class NetDbRenderer {
     }
 
     /**
+     *  Special handling for 'O' cap
+     *  @param caps non-null
+     *  @since 0.9.38
+     */
+    private static boolean hasCap(RouterInfo ri, String caps) {
+        String ricaps = ri.getCapabilities();
+        if (caps.equals("O")) {
+            return ricaps.contains(caps) &&
+                   !ricaps.contains("P") &&
+                   !ricaps.contains("X");
+        } else {
+            return ricaps.contains(caps);
+        }
+    }
+
+    /**
      *  @param debug @since 0.7.14 sort by distance from us, display
      *               median distance, and other stuff, useful when floodfill
      */
@@ -500,24 +522,55 @@ class NetDbRenderer {
                         median = dist;
                 }
                 buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
+                int type = ls.getType();
+                buf.append("&nbsp;&nbsp;<b>Type: </b>").append(type);
+                if (type != DatabaseEntry.KEY_TYPE_LEASESET) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    buf.append("&nbsp;&nbsp;<b>Unpublished? </b>").append(ls2.isUnpublished());
+                    boolean isOff = ls2.isOffline();
+                    buf.append("&nbsp;&nbsp;<b>Offline signed? </b>").append(isOff);
+                    if (isOff)
+                        buf.append("&nbsp;&nbsp;<b>Type: </b>").append(ls2.getTransientSigningKey().getType());
+                }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
-                buf.append("&nbsp;&nbsp;<b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
+                if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+                    buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ELGAMAL_2048 ")
+                       .append(ls.getEncryptionKey().toBase64().substring(0, 20))
+                       .append("&hellip;");
+                } else if (type == DatabaseEntry.KEY_TYPE_LS2) {
+                    LeaseSet2 ls2 = (LeaseSet2) ls;
+                    for (PublicKey pk : ls2.getEncryptionKeys()) {
+                        buf.append("</td></tr>\n<tr><td colspan=\"2\"><b>Encryption Key:</b> ");
+                        EncType etype = pk.getType();
+                        if (etype != null)
+                            buf.append(etype);
+                        else
+                            buf.append("Unsupported type ").append(pk.getUnknownTypeCode());
+                        buf.append(' ')
+                           .append(pk.toBase64().substring(0, 20))
+                           .append("&hellip;");
+                    }
+                }
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 buf.append("<b>Routing Key:</b> ").append(ls.getRoutingKey().toBase64());
                 buf.append("</td></tr>");
 
             }
             buf.append("<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
+            boolean isMeta = ls.getType() == DatabaseEntry.KEY_TYPE_META_LS2;
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
                 buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"netdb_gateway\" title=\"")
                    .append(_t("Gateway")).append("\"><img src=\"themes/console/images/info/gateway.png\" alt=\"")
                    .append(_t("Gateway")).append("\"></span> <span class=\"tunnel_peer\">");
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
-                buf.append("</span> <span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
-                   .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
+                buf.append("</span> ");
+                if (!isMeta) {
+                    buf.append("<span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
+                       .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
+                }
                 if (debug) {
                     long exl = lease.getEndDate().getTime() - now;
                     if (exl > 0)
@@ -553,23 +606,6 @@ class NetDbRenderer {
         }  // !empty
         out.write(buf.toString());
         out.flush();
-    }
-
-    /**
-     * For debugging
-     * http://forums.sun.com/thread.jspa?threadID=597652
-     * @since 0.7.14
-     */
-    public static double biLog2(BigInteger a) {
-        int b = a.bitLength() - 1;
-        double c = 0;
-        double d = 0.5;
-        for (int i = b; i >= 0; --i) {
-             if (a.testBit(i))
-                 c += d;
-             d /= 2;
-        }
-        return b + c;
     }
 
     /**
@@ -785,6 +821,27 @@ class NetDbRenderer {
     }
 
     /**
+     *  Sort by style, then host
+     *  @since 0.9.38
+     */
+    static class RAComparator implements Comparator<RouterAddress> {
+         private static final long serialVersionUID = 1L;
+
+         public int compare(RouterAddress l, RouterAddress r) {
+             int rv = l.getTransportStyle().compareTo(r.getTransportStyle());
+             if (rv != 0)
+                 return rv;
+             String lh = l.getHost();
+             String rh = r.getHost();
+             if (lh == null)
+                 return (rh == null) ? 0 : -1;
+             if (rh == null)
+                 return 1;
+             return lh.compareTo(rh);
+        }
+    }
+
+    /**
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities
      */
@@ -836,7 +893,13 @@ class NetDbRenderer {
         if (addrs.isEmpty()) {
             buf.append(_t("none"));
         } else {
-            for (RouterAddress addr : info.getAddresses()) {
+            if (addrs.size() > 1) {
+                // addrs is unmodifiable
+                List<RouterAddress> laddrs = new ArrayList<RouterAddress>(addrs);
+                Collections.sort(laddrs, new RAComparator());
+                addrs = laddrs;
+            }
+            for (RouterAddress addr : addrs) {
                 String style = addr.getTransportStyle();
                 buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
                 int cost = addr.getCost();

@@ -25,6 +25,8 @@
 #include "include/fn.h"
 #include "include/portcheck.h"
 #import "SBridge.h"
+#import "Deployer.h"
+#include "logger_c.h"
 
 #ifdef __cplusplus
 #include <string>
@@ -61,90 +63,22 @@ using namespace subprocess;
   return YES;
 }
 
-#ifdef __cplusplus
-
 - (void)extractI2PBaseDir:(void(^)(BOOL success, NSError *error))completion
 {
-  
-  NSBundle *launcherBundle = [NSBundle mainBundle];
-  auto homeDir = RealHomeDirectory();
-  NSLog(@"Home directory is %s", homeDir);
-  
-  std::string basePath(homeDir);
-  basePath.append("/Library/I2P");
-  
-  auto jarResPath = [launcherBundle pathForResource:@"launcher" ofType:@"jar"];
-  NSLog(@"Trying to load launcher.jar from url = %@", jarResPath);
-  self.metaInfo.jarFile = jarResPath;
-  self.metaInfo.zipFile = [launcherBundle pathForResource:@"base" ofType:@"zip"];
-  
-  NSParameterAssert(basePath.c_str());
-  NSError *error = NULL;
-  BOOL success = NO;
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
-
-    try {
-      std::string basearg("-Di2p.dir.base=");
-      basearg += basePath;
-
-      std::string zippath("-Di2p.base.zip=");
-      zippath += [self.metaInfo.zipFile UTF8String];
-
-      std::string jarfile("-cp ");
-      jarfile += [self.metaInfo.jarFile UTF8String];
-
-      // Create directory
-      mkdir(basePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
-
-      auto cli = defaultFlagsForExtractorJob;
-      setenv("I2PBASE", basePath.c_str(), true);
-      setenv("ZIPPATH", zippath.c_str(), true);
-      //setenv("DYLD_LIBRARY_PATH",".:/usr/lib:/lib:/usr/local/lib", true);
-
-      cli.push_back(basearg);
-      cli.push_back(zippath);
-      cli.push_back(jarfile);
-      cli.push_back("net.i2p.launchers.BaseExtractor");
-      auto rs = [[RouterProcessStatus alloc] init];
-      
-      std::string execStr = std::string([rs.getJavaHome UTF8String]);
-      for_each(cli, [&execStr](std::string str){ execStr += std::string(" ") + str; });
-
-      NSLog(@"Trying cmd: %@", [NSString stringWithUTF8String:execStr.c_str()]);
-      sendUserNotification(APP_IDSTR, @"Please hold on while we extract I2P. You'll get a new message once done!");
-      int extractStatus = Popen(execStr.c_str(), environment{{
-        {"ZIPPATH", zippath.c_str()},
-        {"I2PBASE", basePath.c_str()}
-      }}).wait();
-      NSLog(@"Extraction exit code %@",[NSString stringWithUTF8String:(std::to_string(extractStatus)).c_str()]);
-      if (extractStatus == 0) {
-        NSLog(@"Extraction process done");
-      } else {
-        NSLog(@"Something went wrong");
-      }
-
-      // All done. Assume success and error are already set.
-      dispatch_async(dispatch_get_main_queue(), ^{
-        if (completion) {
-          completion(success, error);
-        }
-      });
-      
-      
-    } catch (OSError &err) {
-      auto errMsg = [NSString stringWithUTF8String:err.what()];
-      NSLog(@"Exception: %@", errMsg);
-      sendUserNotification(APP_IDSTR, [NSString stringWithFormat:@"Error: %@", errMsg]);
-    }
-  });
+  self.deployer = [[I2PDeployer alloc] initWithMetaInfo:self.metaInfo];
+  [self.deployer extractI2PBaseDir:completion];
 }
 
 - (void)setApplicationDefaultPreferences {
   [self.userPreferences registerDefaults:@{
     @"enableLogging": @YES,
     @"enableVerboseLogging": @YES,
-    @"autoStartRouter": @YES,
+    @"autoStartRouterAtBoot": @NO,
+    @"startLauncherAtLogin": @NO,
+    @"startRouterAtStartup": @YES,
+    @"stopRouterAtShutdown": @YES,
+    @"letRouterLiveEvenLauncherDied": @NO,
+    @"consolePortCheckNum": @7657,
     @"i2pBaseDirectory": (NSString *)CFStringCreateWithCString(NULL, const_cast<const char *>(getDefaultBaseDir().c_str()), kCFStringEncodingUTF8)
   }];
 
@@ -154,10 +88,8 @@ using namespace subprocess;
   CFPreferencesSetMultiple((CFDictionaryRef)dict, NULL, CFAPPDOMAIN, kCFPreferencesCurrentUser, kCFPreferencesCurrentHost);
   CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
-  if (self.enableVerboseLogging) NSLog(@"Default preferences stored!");
+  NSLog(@"Default preferences stored!");
 }
-
-#endif
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -183,13 +115,16 @@ using namespace subprocess;
 
   RouterProcessStatus* routerStatus = [[RouterProcessStatus alloc] init];
   std::string i2pBaseDir(getDefaultBaseDir());
-  NSLog(@"i2pBaseDir = %s", i2pBaseDir.c_str());
+  MLOG(INFO) << "i2pBaseDir = " << i2pBaseDir.c_str();
   bool shouldAutoStartRouter = false;
   
-  // TODO: Make the port a setting which defaults to 7657
-  if (port_check(7657) != 0)
+  // Initialize the Swift environment (the UI components)
+  [self.swiftRuntime applicationDidFinishLaunching];
+  
+  NSInteger portNum = [self.userPreferences integerForKey:@"consolePortCheckNum"];
+  if (port_check((int)portNum) != 0)
   {
-    NSLog(@"Seems i2p is already running - I will not start the router (port 7657 is in use..)");
+    NSLog(@"Seems i2p is already running - I will not start the router (port %d is in use..)", (int)portNum);
     sendUserNotification(@"Found already running router", @"TCP port 7657 seem to be used by another i2p instance.");
     
     [routerStatus setRouterStatus: true];
@@ -197,6 +132,13 @@ using namespace subprocess;
     shouldAutoStartRouter = false;
   } else {
     shouldAutoStartRouter = true;
+  }
+  if (![self.userPreferences boolForKey:@"startRouterAtLogin"] && ![self.userPreferences boolForKey:@"startRouterAtStartup"])
+  {
+    // In this case we don't want to find a running service
+    std::string launchdFile(RealHomeDirectory());
+    launchdFile += "/Library/LaunchAgents/net.i2p.macosx.I2PRouter.plist";
+    
   }
 
   NSBundle *launcherBundle = [NSBundle mainBundle];
@@ -215,18 +157,11 @@ using namespace subprocess;
   std::string jarfile("-cp ");
   jarfile += [self.metaInfo.zipFile UTF8String];
   
-  // Might be hard to read if you're not used to Objective-C
-  // But this is a "function call" that contains a "callback function"
-  [routerStatus listenForEventWithEventName:@"router_can_start" callbackActionFn:^(NSString* information) {
-    NSLog(@"Got signal, router can be started");
-    [[SBridge sharedInstance] startupI2PRouter:self.metaInfo.i2pBase javaBinPath:self.metaInfo.javaBinary];
-  }];
-  
   // This will trigger the router start after an upgrade.
   [routerStatus listenForEventWithEventName:@"router_must_upgrade" callbackActionFn:^(NSString* information) {
     NSLog(@"Got signal, router must be deployed from base.zip");
     [self extractI2PBaseDir:^(BOOL success, NSError *error) {
-      if (success && error != nil) {
+      if (success) {
         sendUserNotification(@"I2P is done extracting", @"I2P is now installed and ready to run!");
         NSLog(@"Done extracting I2P");
         [routerStatus triggerEventWithEn:@"extract_completed" details:@"upgrade complete"];
@@ -237,11 +172,12 @@ using namespace subprocess;
     }];
   }];
   
-  // Initialize the Swift environment (the UI components)
-  [self.swiftRuntime applicationDidFinishLaunching];
-  
   NSString *nsI2PBaseStr = [NSString stringWithUTF8String:i2pBaseDir.c_str()];
 
+  [routerStatus listenForEventWithEventName:@"extract_completed" callbackActionFn:^(NSString* information) {
+    NSLog(@"Time to detect I2P version in install directory");
+    [self.swiftRuntime findInstalledI2PVersion];
+  }];
   
   //struct stat sb;
   //if ( !(stat(i2pBaseDir.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) )
@@ -265,10 +201,7 @@ using namespace subprocess;
       [self.swiftRuntime findInstalledI2PVersion];
     } else {
       // The directory exists, but not i2p.jar - most likely we're in mid-extraction state.
-      [routerStatus listenForEventWithEventName:@"extract_completed" callbackActionFn:^(NSString* information) {
-        NSLog(@"Time to detect I2P version in install directory");
-        [self.swiftRuntime findInstalledI2PVersion];
-      }];
+      [routerStatus triggerEventWithEn:@"router_must_upgrade" details:@"deploy needed"];
     }
   }
   
@@ -282,6 +215,7 @@ using namespace subprocess;
  **/
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
   // Tear down here
+  [self.swiftRuntime applicationWillTerminate];
   NSString *string = @"applicationWillTerminate executed";
   NSLog(@"%@", string);
   [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:nil];

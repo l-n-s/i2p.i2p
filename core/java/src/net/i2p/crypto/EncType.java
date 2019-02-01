@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static net.i2p.crypto.x25519.spec.X25519Spec.X25519_SPEC;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
@@ -29,14 +30,30 @@ public enum EncType {
      */
     ELGAMAL_2048(0, 256, 256, EncAlgo.ELGAMAL, "ElGamal/None/NoPadding", CryptoConstants.I2P_ELGAMAL_2048_SPEC, "0"),
 
-    /**  Pubkey 64 bytes; privkey 32 bytes; */
-    EC_P256(1, 64, 32, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P256_SPEC, "0.9.20"),
+    /**
+     *  Used by i2pd. Not yet supported by Java I2P.
+     *  Pubkey 64 bytes; privkey 32 bytes.
+     */
+    EC_P256(1, 64, 32, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P256_SPEC, "0.9.38"),
 
-    /**  Pubkey 96 bytes; privkey 48 bytes; */
-    EC_P384(2, 96, 48, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P384_SPEC, "0.9.20"),
+    /**
+     *  Reserved, not used by anybody.
+     *  Pubkey 96 bytes; privkey 48 bytes.
+     */
+    EC_P384(2, 96, 48, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P384_SPEC, "0.9.38"),
 
-    /**  Pubkey 132 bytes; privkey 66 bytes; */
-    EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.20");
+    /**
+     *  Reserved, not used by anybody.
+     *  Pubkey 132 bytes; privkey 66 bytes.
+     */
+    EC_P521(3, 132, 66, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P521_SPEC, "0.9.38"),
+
+    /**
+     *  Proposal 144. Not yet supported by anybody.
+     *  Pubkey 32 bytes; privkey 32 bytes
+     *  @since 0.9.38
+     */
+    ECIES_X25519(4, 32, 32, EncAlgo.ECIES, "EC/None/NoPadding", X25519_SPEC, "0.9.38");
 
 
 
@@ -106,6 +123,9 @@ public enum EncType {
     private boolean x_isAvailable() {
         if (ELGAMAL_2048 == this)
             return true;
+        // EC types are placeholders for now
+        if (base == EncAlgo.EC)
+            return false;
         try {
             getParams();
         } catch (InvalidParameterSpecException e) {

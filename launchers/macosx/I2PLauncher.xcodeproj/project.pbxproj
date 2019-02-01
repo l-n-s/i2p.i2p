@@ -9,30 +9,43 @@
 /* Begin PBXBuildFile section */
 		BF07789721506C810014EB07 /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF07789621506C810014EB07 /* Storyboard.storyboard */; };
 		BF07789E21506D2B0014EB07 /* PopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF07789C21506D2B0014EB07 /* PopoverViewController.swift */; };
+		BF0956E721EAD3590014EB07 /* profile.tgz in Resources */ = {isa = PBXBuildFile; fileRef = BF0956E621EAD3590014EB07 /* profile.tgz */; };
 		BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */; };
 		BF14B710215C98DC0014EB07 /* Logger.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF14B70E215C98DC0014EB07 /* Logger.mm */; };
 		BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */; };
+		BF1D6D8F21BB32460014EB07 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */; };
+		BF1D6D9121BB344D0014EB07 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9021BB344D0014EB07 /* Preferences.swift */; };
+		BF1D6D9321BB36880014EB07 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */; };
+		BF1D6D9521BB379A0014EB07 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */; };
+		BF1D6D9921BB7DC10014EB07 /* FirefoxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */; };
+		BF1D6D9B21BB86520014EB07 /* ConsoleWebView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */; };
+		BF1D6D9D21BB87000014EB07 /* EmbeddedConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */; };
+		BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1D6D9E21BBA1460014EB07 /* WebKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		BF1D6DA321BBB8120014EB07 /* AdvancedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */; };
+		BF1D6DA521BBB84E0014EB07 /* PreferencesViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */; };
 		BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA39215140E60014EB07 /* SBridge.mm */; };
 		BF1EFA40215141110014EB07 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3D215141100014EB07 /* main.mm */; };
 		BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF1EFA3E215141100014EB07 /* RouterTask.mm */; };
 		BF1EFA47215141640014EB07 /* base.zip in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA44215141630014EB07 /* base.zip */; };
 		BF1EFA48215141640014EB07 /* ItoopieTransparent.png in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA45215141640014EB07 /* ItoopieTransparent.png */; };
 		BF3143FE2160C1BD0014EB07 /* DownloadJavaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */; };
-		BF4AA39F215AA58B0014EB07 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */; };
 		BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BF50616E2113C48E0014EB07 /* I2PLauncher.xcdatamodeld */; };
 		BF5061722113C4900014EB07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5061712113C4900014EB07 /* Assets.xcassets */; };
 		BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF5061732113C4900014EB07 /* UserInterfaces.xib */; };
 		BF5061962113C84E0014EB07 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5061952113C84E0014EB07 /* Cocoa.framework */; };
 		BF5315072150C55B0014EB07 /* RouterRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315062150C55B0014EB07 /* RouterRunner.swift */; };
-		BF53150B2150C6E80014EB07 /* I2PSubprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */; };
 		BF53150D2150CE310014EB07 /* DateTimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF53150C2150CE310014EB07 /* DateTimeUtils.swift */; };
 		BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */; };
 		BF531515215105B40014EB07 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF531514215105B40014EB07 /* LogViewController.swift */; };
 		BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */ = {isa = PBXBuildFile; fileRef = BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */; };
-		BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */ = {isa = PBXBuildFile; fileRef = BF650CA72152AC7D0014EB07 /* Deployer.m */; };
+		BF650CAB2152AC7D0014EB07 /* Deployer.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF650CA72152AC7D0014EB07 /* Deployer.mm */; };
 		BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */; };
 		BF86541321515CA00014EB07 /* launcher.jar in Resources */ = {isa = PBXBuildFile; fileRef = BF1EFA46215141640014EB07 /* launcher.jar */; };
 		BF865417215182820014EB07 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF865416215182820014EB07 /* Foundation.framework */; };
+		BFA5226221CD43480014EB07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA5226121CD43480014EB07 /* AppDelegate.swift */; };
+		BFA5226421CD434A0014EB07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BFA5226321CD434A0014EB07 /* Assets.xcassets */; };
+		BFA5226E21CD44740014EB07 /* StartupItemApp.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = BFA5225F21CD43480014EB07 /* StartupItemApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BFA5227021CDBF450014EB07 /* Startup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA5226F21CDBF450014EB07 /* Startup.swift */; };
 		BFBDCAE9215040670014EB07 /* Subprocess.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAE8215040670014EB07 /* Subprocess.swift */; };
 		BFBDCAEB215041630014EB07 /* TaskPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEA215041630014EB07 /* TaskPipeline.swift */; };
 		BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCAEC215041C10014EB07 /* Subprocess+CompactAPI.swift */; };
@@ -46,22 +59,23 @@
 		BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBDCAFF21505BED0014EB07 /* AppKit.framework */; };
 		BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB01215060190014EB07 /* DetectJava.swift */; };
 		BFBDCB04215060970014EB07 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBDCB03215060970014EB07 /* StatusBarController.swift */; };
+		BFD899432169EE9F0014EB07 /* LaunchAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD899422169EE9F0014EB07 /* LaunchAgent.swift */; };
+		BFD899452169EFE90014EB07 /* LaunchAgent+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD899442169EFE90014EB07 /* LaunchAgent+Status.swift */; };
+		BFD899472169F01B0014EB07 /* LaunchAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD899462169F01B0014EB07 /* LaunchAgentManager.swift */; };
 		BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDD81D92156B3E30014EB07 /* RouterManager.swift */; };
 		BFE16BF82156C61E0014EB07 /* RouterStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */; };
 		BFE16BFA2156DAED0014EB07 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE16BF92156DAED0014EB07 /* EventManager.swift */; };
-		BFE16BFE2156FD2A0014EB07 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE16BFD2156FD290014EB07 /* Sparkle.framework */; };
-		BFE16C002156FD9E0014EB07 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BFE16BFD2156FD290014EB07 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BFE16BFF2156FD890014EB07 /* CopyFiles */ = {
+		BFA5226D21CD44610014EB07 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
 			files = (
-				BFE16C002156FD9E0014EB07 /* Sparkle.framework in CopyFiles */,
+				BFA5226E21CD44740014EB07 /* StartupItemApp.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,12 +84,23 @@
 /* Begin PBXFileReference section */
 		BF07789621506C810014EB07 /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		BF07789C21506D2B0014EB07 /* PopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverViewController.swift; sourceTree = "<group>"; };
+		BF0956E621EAD3590014EB07 /* profile.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = profile.tgz; sourceTree = "<group>"; };
 		BF14B70B215C98DC0014EB07 /* LoggerWorker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LoggerWorker.hpp; sourceTree = SOURCE_ROOT; };
 		BF14B70C215C98DC0014EB07 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = SOURCE_ROOT; };
 		BF14B70D215C98DC0014EB07 /* LoggerWorker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoggerWorker.cpp; sourceTree = SOURCE_ROOT; };
 		BF14B70E215C98DC0014EB07 /* Logger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Logger.mm; sourceTree = SOURCE_ROOT; };
 		BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderContentMonitor.swift; sourceTree = "<group>"; };
 		BF14B714215DA3330014EB07 /* version.h.tpl */ = {isa = PBXFileReference; lastKnownFileType = text; path = version.h.tpl; sourceTree = "<group>"; };
+		BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
+		BF1D6D9021BB344D0014EB07 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
+		BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxManager.swift; sourceTree = "<group>"; };
+		BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ConsoleWebView.storyboard; sourceTree = "<group>"; };
+		BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedConsoleView.swift; sourceTree = "<group>"; };
+		BF1D6D9E21BBA1460014EB07 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedTableView.swift; sourceTree = "<group>"; };
+		BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreferencesViewController+TableView.swift"; sourceTree = "<group>"; };
 		BF1EFA38215140E60014EB07 /* SBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBridge.h; sourceTree = SOURCE_ROOT; };
 		BF1EFA39215140E60014EB07 /* SBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SBridge.mm; sourceTree = SOURCE_ROOT; };
 		BF1EFA3B215141100014EB07 /* RouterTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterTask.h; sourceTree = SOURCE_ROOT; };
@@ -88,7 +113,6 @@
 		BF1EFA46215141640014EB07 /* launcher.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = launcher.jar; sourceTree = "<group>"; };
 		BF3143FD2160C1BD0014EB07 /* DownloadJavaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadJavaViewController.swift; sourceTree = "<group>"; };
 		BF3143FF2160CA350014EB07 /* logger_c.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logger_c.h; sourceTree = "<group>"; };
-		BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/NetworkExtension.framework; sourceTree = DEVELOPER_DIR; };
 		BF5061682113C48E0014EB07 /* I2PLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = I2PLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF50616F2113C48E0014EB07 /* I2PLauncher.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = I2PLauncher.xcdatamodel; sourceTree = "<group>"; };
 		BF5061712113C4900014EB07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -97,16 +121,21 @@
 		BF5061792113C4900014EB07 /* I2PLauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = I2PLauncher.entitlements; sourceTree = "<group>"; };
 		BF5061952113C84E0014EB07 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		BF5315062150C55B0014EB07 /* RouterRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterRunner.swift; sourceTree = "<group>"; };
-		BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I2PSubprocess.swift; sourceTree = "<group>"; };
 		BF53150C2150CE310014EB07 /* DateTimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimeUtils.swift; sourceTree = "<group>"; };
 		BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RouterProcessStatus+ObjectiveC.swift"; sourceTree = "<group>"; };
 		BF531514215105B40014EB07 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bumpInfoPlist.sh; sourceTree = SOURCE_ROOT; };
-		BF650CA72152AC7D0014EB07 /* Deployer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Deployer.m; sourceTree = SOURCE_ROOT; };
+		BF650CA72152AC7D0014EB07 /* Deployer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Deployer.mm; sourceTree = SOURCE_ROOT; };
 		BF650CA82152AC7D0014EB07 /* Deployer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Deployer.h; sourceTree = SOURCE_ROOT; };
 		BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterProcessStatus.swift; sourceTree = "<group>"; };
 		BF865414215180F60014EB07 /* libswiftDarwin.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftDarwin.tbd; path = System/Library/PrivateFrameworks/Swift/libswiftDarwin.tbd; sourceTree = SDKROOT; };
 		BF865416215182820014EB07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BFA5225F21CD43480014EB07 /* StartupItemApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StartupItemApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFA5226121CD43480014EB07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BFA5226321CD434A0014EB07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BFA5226821CD434A0014EB07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BFA5226921CD434A0014EB07 /* StartupItemApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StartupItemApp.entitlements; sourceTree = "<group>"; };
+		BFA5226F21CDBF450014EB07 /* Startup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Startup.swift; sourceTree = "<group>"; };
 		BFBDCAE8215040670014EB07 /* Subprocess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subprocess.swift; sourceTree = "<group>"; };
 		BFBDCAEA215041630014EB07 /* TaskPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPipeline.swift; sourceTree = "<group>"; };
 		BFBDCAEC215041C10014EB07 /* Subprocess+CompactAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Subprocess+CompactAPI.swift"; sourceTree = "<group>"; };
@@ -121,6 +150,9 @@
 		BFBDCAFF21505BED0014EB07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BFBDCB01215060190014EB07 /* DetectJava.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectJava.swift; sourceTree = "<group>"; };
 		BFBDCB03215060970014EB07 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
+		BFD899422169EE9F0014EB07 /* LaunchAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgent.swift; sourceTree = "<group>"; };
+		BFD899442169EFE90014EB07 /* LaunchAgent+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LaunchAgent+Status.swift"; sourceTree = "<group>"; };
+		BFD899462169F01B0014EB07 /* LaunchAgentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgentManager.swift; sourceTree = "<group>"; };
 		BFDD81D92156B3E30014EB07 /* RouterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterManager.swift; sourceTree = "<group>"; };
 		BFE16BF72156C61E0014EB07 /* RouterStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterStatusView.swift; sourceTree = "<group>"; };
 		BFE16BF92156DAED0014EB07 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
@@ -134,12 +166,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF1D6D9F21BBA1460014EB07 /* WebKit.framework in Frameworks */,
 				BFE1CBAD2151908F0014EB07 /* CoreFoundation.framework in Frameworks */,
-				BF4AA39F215AA58B0014EB07 /* NetworkExtension.framework in Frameworks */,
 				BF865417215182820014EB07 /* Foundation.framework in Frameworks */,
-				BFE16BFE2156FD2A0014EB07 /* Sparkle.framework in Frameworks */,
 				BFBDCB0021505BEE0014EB07 /* AppKit.framework in Frameworks */,
 				BF5061962113C84E0014EB07 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFA5225C21CD43480014EB07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,6 +201,7 @@
 		BF0778A12150897A0014EB07 /* userinterface */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA121BBAA420014EB07 /* preferences */,
 				BF07789C21506D2B0014EB07 /* PopoverViewController.swift */,
 				BFBDCB03215060970014EB07 /* StatusBarController.swift */,
 				BF531514215105B40014EB07 /* LogViewController.swift */,
@@ -172,14 +211,47 @@
 			path = userinterface;
 			sourceTree = "<group>";
 		};
+		BF1D6DA021BBA9910014EB07 /* browser */ = {
+			isa = PBXGroup;
+			children = (
+				BF1D6D9C21BB87000014EB07 /* EmbeddedConsoleView.swift */,
+				BF1D6D9A21BB86520014EB07 /* ConsoleWebView.storyboard */,
+				BF1D6D9821BB7DC10014EB07 /* FirefoxManager.swift */,
+			);
+			path = browser;
+			sourceTree = "<group>";
+		};
+		BF1D6DA121BBAA420014EB07 /* preferences */ = {
+			isa = PBXGroup;
+			children = (
+				BF1D6D9221BB36880014EB07 /* PreferencesViewController.swift */,
+				BF1D6DA421BBB84E0014EB07 /* PreferencesViewController+TableView.swift */,
+				BF1D6D9421BB379A0014EB07 /* PreferencesWindowController.swift */,
+				BF1D6DA221BBB8120014EB07 /* AdvancedTableView.swift */,
+			);
+			path = preferences;
+			sourceTree = "<group>";
+		};
+		BF1D6DA621BBB9F50014EB07 /* launchd */ = {
+			isa = PBXGroup;
+			children = (
+				BFD899422169EE9F0014EB07 /* LaunchAgent.swift */,
+				BFD899442169EFE90014EB07 /* LaunchAgent+Status.swift */,
+				BFD899462169F01B0014EB07 /* LaunchAgentManager.swift */,
+			);
+			path = launchd;
+			sourceTree = "<group>";
+		};
 		BF50615F2113C48E0014EB07 = {
 			isa = PBXGroup;
 			children = (
+				BF0956E621EAD3590014EB07 /* profile.tgz */,
 				BF14B714215DA3330014EB07 /* version.h.tpl */,
 				BF1EFA44215141630014EB07 /* base.zip */,
 				BF1EFA45215141640014EB07 /* ItoopieTransparent.png */,
 				BF1EFA46215141640014EB07 /* launcher.jar */,
 				BF50616A2113C48E0014EB07 /* I2PLauncher */,
+				BFA5226021CD43480014EB07 /* StartupItemApp */,
 				BF5061692113C48E0014EB07 /* Products */,
 				BF5061922113C6ED0014EB07 /* Frameworks */,
 			);
@@ -189,6 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				BF5061682113C48E0014EB07 /* I2PLauncher.app */,
+				BFA5225F21CD43480014EB07 /* StartupItemApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -202,7 +275,7 @@
 				BF14B70B215C98DC0014EB07 /* LoggerWorker.hpp */,
 				BF650CA52152AC7D0014EB07 /* bumpInfoPlist.sh */,
 				BF650CA82152AC7D0014EB07 /* Deployer.h */,
-				BF650CA72152AC7D0014EB07 /* Deployer.m */,
+				BF650CA72152AC7D0014EB07 /* Deployer.mm */,
 				BF1EFA42215141220014EB07 /* include */,
 				BF1EFA3F215141110014EB07 /* AppDelegate.h */,
 				BF3143FF2160CA350014EB07 /* logger_c.h */,
@@ -222,6 +295,7 @@
 				BF50616E2113C48E0014EB07 /* I2PLauncher.xcdatamodeld */,
 				BFF45818213C428E0014EB07 /* I2PLauncher-Bridging-Header.h */,
 				BF07789621506C810014EB07 /* Storyboard.storyboard */,
+				BF1D6D8E21BB32460014EB07 /* Preferences.storyboard */,
 				BFBDCAFD2150567D0014EB07 /* SwiftMainDelegate.swift */,
 			);
 			path = I2PLauncher;
@@ -230,7 +304,7 @@
 		BF5061922113C6ED0014EB07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BF4AA39E215AA58B0014EB07 /* NetworkExtension.framework */,
+				BF1D6D9E21BBA1460014EB07 /* WebKit.framework */,
 				BFE16BFD2156FD290014EB07 /* Sparkle.framework */,
 				BFE1CBAC2151908F0014EB07 /* CoreFoundation.framework */,
 				BF865416215182820014EB07 /* Foundation.framework */,
@@ -244,11 +318,11 @@
 		BF5315042150C4860014EB07 /* routermgmt */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA621BBB9F50014EB07 /* launchd */,
 				BFBDCB01215060190014EB07 /* DetectJava.swift */,
 				BF7506CA21509CFD0014EB07 /* RouterProcessStatus.swift */,
 				BF5315122150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift */,
 				BF5315062150C55B0014EB07 /* RouterRunner.swift */,
-				BF53150A2150C6E80014EB07 /* I2PSubprocess.swift */,
 				BFDD81D92156B3E30014EB07 /* RouterManager.swift */,
 			);
 			path = routermgmt;
@@ -257,14 +331,28 @@
 		BF5315052150C4AB0014EB07 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				BF1D6DA021BBA9910014EB07 /* browser */,
 				BFBDCAF9215050810014EB07 /* ReflectionFunctions.swift */,
 				BFBDCAF52150428D0014EB07 /* StringExtensions.swift */,
 				BFBDCAF7215047FE0014EB07 /* ArrayExtensions.swift */,
 				BF53150C2150CE310014EB07 /* DateTimeUtils.swift */,
 				BFE16BF92156DAED0014EB07 /* EventManager.swift */,
 				BF14B711215D9E040014EB07 /* FolderContentMonitor.swift */,
+				BF1D6D9021BB344D0014EB07 /* Preferences.swift */,
+				BFA5226F21CDBF450014EB07 /* Startup.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		BFA5226021CD43480014EB07 /* StartupItemApp */ = {
+			isa = PBXGroup;
+			children = (
+				BFA5226121CD43480014EB07 /* AppDelegate.swift */,
+				BFA5226321CD434A0014EB07 /* Assets.xcassets */,
+				BFA5226821CD434A0014EB07 /* Info.plist */,
+				BFA5226921CD434A0014EB07 /* StartupItemApp.entitlements */,
+			);
+			path = StartupItemApp;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -279,7 +367,7 @@
 				BF5061652113C48E0014EB07 /* Frameworks */,
 				BF1EFA4B215142030014EB07 /* ShellScript */,
 				BF5061662113C48E0014EB07 /* Resources */,
-				BFE16BFF2156FD890014EB07 /* CopyFiles */,
+				BFA5226D21CD44610014EB07 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -290,12 +378,30 @@
 			productReference = BF5061682113C48E0014EB07 /* I2PLauncher.app */;
 			productType = "com.apple.product-type.application";
 		};
+		BFA5225E21CD43480014EB07 /* StartupItemApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BFA5226C21CD434A0014EB07 /* Build configuration list for PBXNativeTarget "StartupItemApp" */;
+			buildPhases = (
+				BFA5225B21CD43480014EB07 /* Sources */,
+				BFA5225C21CD43480014EB07 /* Frameworks */,
+				BFA5225D21CD43480014EB07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StartupItemApp;
+			productName = StartupItemApp;
+			productReference = BFA5225F21CD43480014EB07 /* StartupItemApp.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		BF5061602113C48E0014EB07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1010;
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "The I2P Project";
 				TargetAttributes = {
@@ -303,7 +409,7 @@
 						CreatedOnToolsVersion = 9.4.1;
 						DevelopmentTeam = W3C42P2LA8;
 						LastSwiftMigration = 0940;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.Mac = {
 								enabled = 0;
@@ -312,10 +418,20 @@
 								enabled = 1;
 							};
 							com.apple.NetworkExtensions = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.Sandbox = {
 								enabled = 0;
+							};
+						};
+					};
+					BFA5225E21CD43480014EB07 = {
+						CreatedOnToolsVersion = 10.1;
+						DevelopmentTeam = W3C42P2LA8;
+						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 1;
 							};
 						};
 					};
@@ -335,6 +451,7 @@
 			projectRoot = "";
 			targets = (
 				BF5061672113C48E0014EB07 /* I2PLauncher */,
+				BFA5225E21CD43480014EB07 /* StartupItemApp */,
 			);
 		};
 /* End PBXProject section */
@@ -344,6 +461,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF0956E721EAD3590014EB07 /* profile.tgz in Resources */,
 				BF86541321515CA00014EB07 /* launcher.jar in Resources */,
 				BF650CA92152AC7D0014EB07 /* bumpInfoPlist.sh in Resources */,
 				BF07789721506C810014EB07 /* Storyboard.storyboard in Resources */,
@@ -351,6 +469,16 @@
 				BF5061752113C4900014EB07 /* UserInterfaces.xib in Resources */,
 				BF1EFA48215141640014EB07 /* ItoopieTransparent.png in Resources */,
 				BF1EFA47215141640014EB07 /* base.zip in Resources */,
+				BF1D6D8F21BB32460014EB07 /* Preferences.storyboard in Resources */,
+				BF1D6D9B21BB86520014EB07 /* ConsoleWebView.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFA5225D21CD43480014EB07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFA5226421CD434A0014EB07 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,7 +500,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nversion=`/usr/libexec/PlistBuddy -c \"Print I2PRouterVersion\" \"${INFOPLIST_FILE}\"`\ncommit=`mtn heads --branch=i2p.i2p | awk '{ print $1 }' | head -n 1`\nbuildinfo=\"Built $(date), $commit\"\n\n# Use cat to avoid any potential alias of cp asking for overwrite of file.\ncat $SRCROOT/version.h.tpl > $SRCROOT/version.h\nsed -i '' \"s#VERSION_REPLACED_BY_XCODE_BUILD_SCRIPT#$version#g\" $SRCROOT/version.h\nsed -i '' \"s#BUILD_INFO_REPLACED_BY_XCODE_BUILD_SCRIPT#$buildinfo#\" $SRCROOT/version.h\n\n$SRCROOT/check_latest_java.sh\n\n";
 		};
 		BF1EFA4B215142030014EB07 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -385,7 +513,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run from launchers/macosx\nset -x\n\n# Warning to keep clean files\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" \\) -print0 | xargs -0 wc -l | awk '$1 > 200 && $2 != \"total\" { print $2 \":1: warning: file more than 200 lines\" }'\n\nexport BUILDDIR=$(pwd)\nexport MACOSX_SOURCE_DIR=$SRCROOT\nexport I2P_SOURCE_DIR=$(realpath $SRCROOT/../..)\ncd $MACOSX_SOURCE_DIR/..\n# TODO: Find out why sbt hangs when executed in cli\n#./sbt \";macosx:assembly\"\ncd ..\ncd $I2P_SOURCE_DIR\nant preppkg-osx\ncd pkg-temp\nrm -f $BUILDDIR/base.zip\nzip -r -v -9 $BUILDDIR/base.zip *\ncd $MACOSX_SOURCE_DIR\ncp $MACOSX_SOURCE_DIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\n\n\n";
+			shellScript = "# Run from launchers/macosx\nset -x\n\n# Warning to keep clean files\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" \\) -print0 | xargs -0 wc -l | awk '$1 > 200 && $2 != \"total\" { print $2 \":1: warning: file more than 200 lines\" }'\n\nif [ ! -z \"${REPACK_I2P}\" ]; then\n    export BUILDDIR=$(pwd)\n    export MACOSX_SOURCE_DIR=$SRCROOT\n    export I2P_SOURCE_DIR=$(realpath $SRCROOT/../..)\n    cd $MACOSX_SOURCE_DIR/..\n    # TODO: Find out why sbt hangs when executed in cli\n    #./sbt \";macosx:assembly\"\n    cd ..\n    cd $I2P_SOURCE_DIR\n    ant preppkg-osx jbigi-osx-only\n    cp build/jbigi.jar pkg-temp/lib/jbigi.jar\n    cd pkg-temp\n    rm -f $BUILDDIR/base.zip\n    zip -r -v -9 $BUILDDIR/base.zip *\n    cd $MACOSX_SOURCE_DIR\n    cp $MACOSX_SOURCE_DIR/target/scala-2.11/routerLauncher-assembly-0.1.0-SNAPSHOT.jar $BUILDDIR/launcher.jar\nfi\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -404,27 +532,45 @@
 				BF1EFA41215141110014EB07 /* RouterTask.mm in Sources */,
 				BF7506CB21509CFD0014EB07 /* RouterProcessStatus.swift in Sources */,
 				BFBDCAE9215040670014EB07 /* Subprocess.swift in Sources */,
+				BF1D6D9321BB36880014EB07 /* PreferencesViewController.swift in Sources */,
+				BF1D6D9921BB7DC10014EB07 /* FirefoxManager.swift in Sources */,
 				BFBDCAFA215050810014EB07 /* ReflectionFunctions.swift in Sources */,
 				BFBDCAED215041C10014EB07 /* Subprocess+CompactAPI.swift in Sources */,
 				BFBDCB02215060190014EB07 /* DetectJava.swift in Sources */,
 				BF07789E21506D2B0014EB07 /* PopoverViewController.swift in Sources */,
-				BF650CAB2152AC7D0014EB07 /* Deployer.m in Sources */,
+				BF1D6DA321BBB8120014EB07 /* AdvancedTableView.swift in Sources */,
+				BFD899472169F01B0014EB07 /* LaunchAgentManager.swift in Sources */,
+				BF650CAB2152AC7D0014EB07 /* Deployer.mm in Sources */,
+				BF1D6DA521BBB84E0014EB07 /* PreferencesViewController+TableView.swift in Sources */,
 				BF1EFA40215141110014EB07 /* main.mm in Sources */,
 				BFBDCAF4215042670014EB07 /* AppleStuffExceptionHandler.m in Sources */,
 				BF3143FE2160C1BD0014EB07 /* DownloadJavaViewController.swift in Sources */,
+				BF1D6D9521BB379A0014EB07 /* PreferencesWindowController.swift in Sources */,
 				BF531515215105B40014EB07 /* LogViewController.swift in Sources */,
+				BFA5227021CDBF450014EB07 /* Startup.swift in Sources */,
 				BF5315132150EB510014EB07 /* RouterProcessStatus+ObjectiveC.swift in Sources */,
+				BF1D6D9121BB344D0014EB07 /* Preferences.swift in Sources */,
+				BFD899452169EFE90014EB07 /* LaunchAgent+Status.swift in Sources */,
 				BF14B712215D9E040014EB07 /* FolderContentMonitor.swift in Sources */,
 				BFBDCAFE2150567D0014EB07 /* SwiftMainDelegate.swift in Sources */,
+				BFD899432169EE9F0014EB07 /* LaunchAgent.swift in Sources */,
 				BFDD81DA2156B3E30014EB07 /* RouterManager.swift in Sources */,
-				BF53150B2150C6E80014EB07 /* I2PSubprocess.swift in Sources */,
 				BF1EFA3A215140E60014EB07 /* SBridge.mm in Sources */,
 				BF14B70F215C98DC0014EB07 /* LoggerWorker.cpp in Sources */,
+				BF1D6D9D21BB87000014EB07 /* EmbeddedConsoleView.swift in Sources */,
 				BF14B710215C98DC0014EB07 /* Logger.mm in Sources */,
 				BFBDCAF62150428D0014EB07 /* StringExtensions.swift in Sources */,
 				BF5061702113C48E0014EB07 /* I2PLauncher.xcdatamodeld in Sources */,
 				BFBDCAEB215041630014EB07 /* TaskPipeline.swift in Sources */,
 				BF53150D2150CE310014EB07 /* DateTimeUtils.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFA5225B21CD43480014EB07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFA5226221CD43480014EB07 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,12 +637,13 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.13;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -543,11 +690,12 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx10.13;
+				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -557,9 +705,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = I2PLauncher/I2PLauncher.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				COMPRESS_PNG_FILES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
@@ -570,15 +719,20 @@
 					/System/Library/Frameworks,
 					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/include";
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/../../../Sparkle/Sparkle",
+				);
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.i2p.bootstrap-macosx.I2PLauncher";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "I2PLauncher/I2PLauncher-Bridging-Header.h";
@@ -593,9 +747,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = I2PLauncher/I2PLauncher.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				COMPRESS_PNG_FILES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
@@ -606,19 +761,77 @@
 					/System/Library/Frameworks,
 					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/include";
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/../../../Sparkle/Sparkle",
+				);
 				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = include;
 				INFOPLIST_FILE = I2PLauncher/Info.plist;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.I2PLauncher;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.i2p.bootstrap-macosx.I2PLauncher";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "I2PLauncher/I2PLauncher-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(SRCROOT)/include/**";
+			};
+			name = Release;
+		};
+		BFA5226A21CD434A0014EB07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = StartupItemApp/StartupItemApp.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = W3C42P2LA8;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = StartupItemApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.StartupItemApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		BFA5226B21CD434A0014EB07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = StartupItemApp/StartupItemApp.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = W3C42P2LA8;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = StartupItemApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = net.i2p.bootstrap.macosx.StartupItemApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -639,6 +852,15 @@
 			buildConfigurations = (
 				BF50617D2113C4900014EB07 /* Debug */,
 				BF50617E2113C4900014EB07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BFA5226C21CD434A0014EB07 /* Build configuration list for PBXNativeTarget "StartupItemApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFA5226A21CD434A0014EB07 /* Debug */,
+				BFA5226B21CD434A0014EB07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
