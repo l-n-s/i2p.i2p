@@ -11,7 +11,7 @@
 %endif
 
 Name:           i2p
-Version:        0.9.37
+Version:        0.9.38
 Release:        4%{?dist}
 Summary:        Invisible Internet Project (I2P) - anonymous network
 Conflicts:      i2pd
@@ -41,8 +41,6 @@ Requires:	tomcat-lib
 Requires:	tomcat-taglibs-standard 
 Requires:	gnu-getopt
 
-Patch0:         i2p-0.9.37-fix-tomcat.patch
-Patch1:         i2p-0.9.37-no-classpath.patch
 %endif
 
 %description
@@ -57,11 +55,7 @@ trusted parties.
 %setup -q
 %if 0%{?fedora} || 0%{?rhel} >= 8
 
-%if "%version" == "0.9.37" 
-%patch0 -p1
-%patch1 -p1
 echo "without-manifest-classpath=true" >> override.properties
-%endif
 
 sed -i 's/usr\/sbin\/wrapper/usr\/sbin\/java-service-wrapper/' debian/i2p.service
 echo wrapper.java.classpath.2=/usr/lib64/java-service-wrapper/wrapper.jar >> installer/resources/wrapper.config
@@ -242,6 +236,9 @@ getent passwd i2psvc >/dev/null || \
 %dir  %{_localstatedir}/log/i2p
 
 %changelog
+* Fri Feb 1 2019 Viktor Villainov <supervillain@riseup.net> - 0.9.38-0
+- bump version
+
 * Sun Oct 14 2018 Viktor Villainov <supervillain@riseup.net> - 0.9.37-4
 - prevent classpaths in jar manifests
 
