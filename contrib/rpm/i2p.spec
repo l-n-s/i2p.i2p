@@ -12,7 +12,7 @@
 
 Name:           i2p
 Version:        0.9.38
-Release:        4%{?dist}
+Release:        0%{?dist}
 Summary:        Invisible Internet Project (I2P) - anonymous network
 Conflicts:      i2pd
 
@@ -35,12 +35,15 @@ Requires(pre):  %{_sbindir}/useradd %{_sbindir}/groupadd
 BuildRequires:	tomcat-lib 
 BuildRequires:	tomcat-taglibs-standard 
 BuildRequires:	gnu-getopt
+BuildRequires:	jetty
 
 Requires:	java-service-wrapper
 Requires:	tomcat-lib 
 Requires:	tomcat-taglibs-standard 
 Requires:	gnu-getopt
+Requires:	jetty
 
+Patch0:         0002-jetty-compatibility.patch
 %endif
 
 %description
@@ -55,10 +58,30 @@ trusted parties.
 %setup -q
 %if 0%{?fedora} || 0%{?rhel} >= 8
 
+%patch0 -p1
+
 echo "without-manifest-classpath=true" >> override.properties
 
 sed -i 's/usr\/sbin\/wrapper/usr\/sbin\/java-service-wrapper/' debian/i2p.service
 echo wrapper.java.classpath.2=/usr/lib64/java-service-wrapper/wrapper.jar >> installer/resources/wrapper.config
+
+
+echo "with-libjetty9-java=true" >> override.properties
+mkdir -p apps/jetty/jettylib
+ln -sf /usr/share/java/jetty/jetty-continuation.jar apps/jetty/jettylib/jetty-continuation.jar
+ln -sf /usr/share/java/jetty/jetty-deploy.jar apps/jetty/jettylib/jetty-deploy.jar
+ln -sf /usr/share/java/jetty/jetty-http.jar apps/jetty/jettylib/jetty-http.jar
+ln -sf /usr/share/java/jetty/jetty-io.jar apps/jetty/jettylib/jetty-io.jar
+ln -sf /usr/share/java/jetty/jetty-rewrite.jar apps/jetty/jettylib/jetty-rewrite-handler.jar
+ln -sf /usr/share/java/jetty/jetty-security.jar apps/jetty/jettylib/jetty-security.jar
+ln -sf /usr/share/java/jetty/jetty-servlet.jar apps/jetty/jettylib/jetty-servlet.jar
+ln -sf /usr/share/java/jetty/jetty-servlets.jar apps/jetty/jettylib/jetty-servlets.jar
+ln -sf /usr/share/java/jetty/jetty-start.jar apps/jetty/jettylib/jetty-start.jar
+ln -sf /usr/share/java/jetty/jetty-util.jar apps/jetty/jettylib/jetty-util.jar
+ln -sf /usr/share/java/jetty/jetty-webapp.jar apps/jetty/jettylib/jetty-webapp.jar
+ln -sf /usr/share/java/jetty/jetty-xml.jar apps/jetty/jettylib/jetty-xml.jar
+ln -sf /usr/share/java/jetty/jetty-server.jar apps/jetty/jettylib/org.mortbay.jetty.jar
+ln -sf /usr/share/java/jetty/jetty-jmx.jar apps/jetty/jettylib/org.mortbay.jmx.jar
 
 echo "with-libtomcat8-java=true" >> override.properties
 mkdir -p apps/jetty/jettylib
@@ -135,13 +158,21 @@ install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/sam.jar %{buildro
 install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/streaming.jar %{buildroot}%{_datadir}/i2p/lib
 install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/systray.jar %{buildroot}%{_datadir}/i2p/lib
 
-# i2p requires jetty v9.2 currently, fedora has v9.4
-install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/jetty-*.jar %{buildroot}%{_datadir}/i2p/lib
-install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/org.mortbay.jetty.jar %{buildroot}%{_datadir}/i2p/lib
-install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/org.mortbay.jmx.jar %{buildroot}%{_datadir}/i2p/lib
-
-# Tomcat Jasper breaks Router Console, results in: JettyJasperInitializer not found 
-#install -D -m 644 %{_builddir}/%{name}-%{version}/pkg-temp/lib/jasper-runtime.jar %{buildroot}%{_datadir}/i2p/lib
+ln -s %{_javadir}/jetty/apache-jsp.jar %{buildroot}%{_datadir}/i2p/lib/jetty-apache-jsp.jar
+ln -s %{_javadir}/jetty/jetty-continuation.jar %{buildroot}%{_datadir}/i2p/lib/jetty-continuation.jar
+ln -s %{_javadir}/jetty/jetty-deploy.jar %{buildroot}%{_datadir}/i2p/lib/jetty-deploy.jar
+ln -s %{_javadir}/jetty/jetty-http.jar %{buildroot}%{_datadir}/i2p/lib/jetty-http.jar
+ln -s %{_javadir}/jetty/jetty-io.jar %{buildroot}%{_datadir}/i2p/lib/jetty-io.jar
+ln -s %{_javadir}/jetty/jetty-rewrite.jar %{buildroot}%{_datadir}/i2p/lib/jetty-rewrite-handler.jar
+ln -s %{_javadir}/jetty/jetty-security.jar %{buildroot}%{_datadir}/i2p/lib/jetty-security.jar
+ln -s %{_javadir}/jetty/jetty-servlet.jar %{buildroot}%{_datadir}/i2p/lib/jetty-servlet.jar
+ln -s %{_javadir}/jetty/jetty-servlets.jar %{buildroot}%{_datadir}/i2p/lib/jetty-servlets.jar
+ln -s %{_javadir}/jetty/jetty-start.jar %{buildroot}%{_datadir}/i2p/lib/jetty-start.jar
+ln -s %{_javadir}/jetty/jetty-util.jar %{buildroot}%{_datadir}/i2p/lib/jetty-util.jar
+ln -s %{_javadir}/jetty/jetty-webapp.jar %{buildroot}%{_datadir}/i2p/lib/jetty-webapp.jar
+ln -s %{_javadir}/jetty/jetty-xml.jar %{buildroot}%{_datadir}/i2p/lib/jetty-xml.jar
+ln -s %{_javadir}/jetty/jetty-server.jar %{buildroot}%{_datadir}/i2p/lib/org.mortbay.jetty.jar
+ln -s %{_javadir}/jetty/jetty-jmx.jar %{buildroot}%{_datadir}/i2p/lib/org.mortbay.jmx.jar
 
 %if %{fedora} >= 29
 ln -s %{_javadir}/tomcat-servlet-4.0-api.jar %{buildroot}%{_datadir}/i2p/lib/javax.servlet.jar
@@ -191,8 +222,8 @@ ln -s %{_datadir}/i2p/wrapper.config %{buildroot}%{_sysconfdir}/i2p/wrapper.conf
     
 install -d -m 755 %{buildroot}%{_libdir}/i2p
 install -D -m 755 %{_builddir}/%{name}-%{version}/core/c/jbigi/*.so %{buildroot}%{_libdir}/i2p
-ln -s %{_libdir}/i2p/jbigi.so %{buildroot}%{_datadir}/i2p/lib/jbigi.so
-ln -s %{_libdir}/i2p/jcpuid.so %{buildroot}%{_datadir}/i2p/lib/cpuid.so
+ln -s %{_libdir}/i2p/libjbigi.so %{buildroot}%{_datadir}/i2p/lib/libjbigi.so
+ln -s %{_libdir}/i2p/libjcpuid.so %{buildroot}%{_datadir}/i2p/lib/libjcpuid.so
 
 install -d -m 700 %{buildroot}%{_sharedstatedir}/i2p
 install -d -m 700 %{buildroot}%{_localstatedir}/log/i2p
